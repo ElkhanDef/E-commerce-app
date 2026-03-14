@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  postgresql:
+    image: postgres:17
+    container_name: ecommerce-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ecommerce_db
+      POSTGRES_USER: ecommerce
+      POSTGRES_PASSWORD: ecommerce_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: ecommerce-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - ecommerce-network
+
+volumes:
+  postgres_data:
+  minio_data:
+
+networks:
+  ecommerce-network:
+    driver: bridge
