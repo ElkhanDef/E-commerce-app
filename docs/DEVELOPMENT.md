@@ -86,10 +86,10 @@ Password: admin123
 ## Branch Structure
 
 ```
-main              → production, always working
+main              → production
 develop           → main development branch
 feature/EAD-xx    → new feature
-fix/EAD-xx        → bug fix
+bugfix/EAD-xx     → bug fix
 hotfix/EAD-xx     → urgent production fix
 refactor/EAD-xx   → code restructure
 ```

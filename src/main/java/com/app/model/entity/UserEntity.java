@@ -42,6 +42,9 @@ public class UserEntity extends BaseAuditEntity {
     @Column(name = "is_active")
     private boolean isActive;
 
+    @Column(name = "is_verified")
+    private boolean isVerified = false;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     private AddressEntity address;
@@ -70,6 +73,14 @@ public class UserEntity extends BaseAuditEntity {
 
     public Long getId() {
         return id;
+    }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean verified) {
+        isVerified = verified;
     }
 
     public UserRole getRole() {
