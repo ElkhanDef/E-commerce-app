@@ -15,4 +15,8 @@ public class ApplicationException extends RuntimeException {
         super(customMessage);
         this.errorCode = errorCode;
     }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 }

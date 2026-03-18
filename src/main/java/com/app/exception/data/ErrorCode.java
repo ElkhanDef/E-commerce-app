@@ -9,7 +9,10 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"Kullanıcı zaten mevcut"),
 
     //VALIDATION
-    VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "Doğrulama başarısız oldu");
+    VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "Doğrulama başarısız oldu"),
+
+    // GENERIC
+    INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Sunucu hatası");
 
     private final HttpStatus status;
     private final String defaultMessage;

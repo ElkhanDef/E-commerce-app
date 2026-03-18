@@ -3,17 +3,20 @@ package com.app.exception;
 import com.app.exception.data.ErrorCode;
 import com.app.exception.data.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@ControllerAdvice
+@Slf4j
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -24,22 +27,47 @@ public class GlobalExceptionHandler {
             errors.put(error.getField(), error.getDefaultMessage());
         });
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        errorResponse.setMessage(ErrorCode.VALIDATION_FAILED.getDefaultMessage());
-        errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        errorResponse.setValidationErrors(errors);
-        errorResponse.setPath(request.getRequestURI());
-        errorResponse.setTimestamp(LocalDateTime.now());
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ErrorCode.VALIDATION_FAILED.getDefaultMessage())
+                .timestamp(LocalDateTime.now())
+                .path(request.getRequestURI())
+                .validationErrors(errors)
+                .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-//    @ExceptionHandler(ApplicationException.class)
-//    public ResponseEntity<ErrorResponse> handleApplicationException(ApplicationException ex, HttpServletRequest request) {
-//
-//        ErrorResponse errorResponse = new ErrorResponse();
-//
-//
-//    }
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<ErrorResponse> handleApplicationException(ApplicationException ex, HttpServletRequest request) {
+        ErrorCode code = ex.getErrorCode();
+        log.error("ActionLog.ApplicationException [{}]: {}", code.name(), ex.getMessage());
+
+        ErrorResponse response = ErrorResponse.builder()
+                .status(code.getStatus().value())
+                .error(code.getStatus().getReasonPhrase())
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception ex, HttpServletRequest request) {
+        log.error("ActionLog.UnexpectedException", ex);
+        ErrorCode code = ErrorCode.INTERNAL_ERROR;
+
+        ErrorResponse response = ErrorResponse.builder()
+                .status(code.getStatus().value())
+                .error(code.getStatus().getReasonPhrase())
+                .message(code.getDefaultMessage())
+                .timestamp(LocalDateTime.now())
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
