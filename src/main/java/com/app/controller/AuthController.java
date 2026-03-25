@@ -1,5 +1,6 @@
 package com.app.controller;
 
+import com.app.model.dto.request.SignInRequestDto;
 import com.app.model.dto.request.SignUpRequestDto;
 import com.app.model.dto.response.SignUpResponseDto;
 import com.app.service.AuthService;
@@ -24,5 +25,10 @@ public class AuthController {
     @PostMapping(path = "/sign-up")
     public ResponseEntity<SignUpResponseDto> signUp(@RequestBody @Valid SignUpRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signUp(requestDto));
+    }
+
+    @PostMapping(path = "/sign-in")
+    public ResponseEntity<?> signIn(@RequestBody SignInRequestDto requestDto){
+        return ResponseEntity.status(HttpStatus.OK).body(authService.signIn(requestDto));
     }
 }
