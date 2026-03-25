@@ -8,6 +8,11 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "Kullanıcı bulunamadı"),
     USER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"Kullanıcı zaten mevcut"),
 
+    //AUTH
+    USER_NOT_VERIFIED(HttpStatus.UNAUTHORIZED,"Kullanıcı doğrulanmamış"),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Geçersiz kimlik bilgileri"),
+
+
     //VALIDATION
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "Doğrulama başarısız oldu"),
 
