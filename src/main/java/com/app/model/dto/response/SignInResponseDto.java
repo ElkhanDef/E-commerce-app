@@ -33,6 +33,7 @@ public class SignInResponseDto {
         return new Builder();
     }
 
+    @SuppressWarnings("checkstyle:HiddenField")
     public static class Builder {
 
         private Long id;

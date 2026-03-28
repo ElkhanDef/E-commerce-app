@@ -26,7 +26,7 @@ public class RefreshTokenEntity extends BaseAuditEntity {
     private String jti;
 
     @Column(nullable = false)
-    private LocalDateTime expiresAt;
+    private LocalDateTime expiryDate;
 
     @Column(nullable = false)
     private boolean revoked = false;
@@ -47,12 +47,12 @@ public class RefreshTokenEntity extends BaseAuditEntity {
         this.jti = jti;
     }
 
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
+    public LocalDateTime getExpiryDate() {
+        return expiryDate;
     }
 
-    public void setExpiresAt(LocalDateTime expiresAt) {
-        this.expiresAt = expiresAt;
+    public void setExpiryDate(LocalDateTime expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public boolean isRevoked() {
@@ -73,8 +73,12 @@ public class RefreshTokenEntity extends BaseAuditEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof RefreshTokenEntity that)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RefreshTokenEntity that)) {
+            return false;
+        }
         return id != null && id.equals(that.id);
     }
 
