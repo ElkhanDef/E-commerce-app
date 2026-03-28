@@ -24,6 +24,7 @@ public class SignUpResponseDto {
         return new Builder();
     }
 
+    @SuppressWarnings("checkstyle:HiddenField")
     public static class Builder {
         private Long id;
         private String name;

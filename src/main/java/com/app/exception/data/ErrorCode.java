@@ -11,6 +11,7 @@ public enum ErrorCode {
     //AUTH
     USER_NOT_VERIFIED(HttpStatus.UNAUTHORIZED,"Kullanıcı doğrulanmamış"),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Geçersiz kimlik bilgileri"),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED,"Geçersiz refresh token"),
 
 
     //VALIDATION

@@ -3,8 +3,10 @@ package com.app.service.impl;
 import com.app.config.JwtProperties;
 import com.app.exception.ApplicationException;
 import com.app.exception.data.ErrorCode;
+import com.app.model.dto.request.RefreshTokenRequestDto;
 import com.app.model.dto.request.SignInRequestDto;
 import com.app.model.dto.request.SignUpRequestDto;
+import com.app.model.dto.response.RefreshTokenResponseDto;
 import com.app.model.dto.response.SignInResponseDto;
 import com.app.model.dto.response.SignUpResponseDto;
 import com.app.model.entity.RefreshTokenEntity;
@@ -92,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
         refreshTokenRepository.revokeAllUserTokens(user.getId());
         String accessToken = jwtUtils.generateAccessToken(user);
         JwtUtils.TokenWithJti refreshTokenData = jwtUtils.generateRefreshToken(user.getId());
-        saveRefreshTokenJti(refreshTokenData.jti(),user);
+        saveRefreshTokenJti(refreshTokenData.jti(), user);
         log.info("ActionLog.signIn.end");
 
         return SignInResponseDto.builder()
@@ -107,12 +109,65 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    private void saveRefreshTokenJti(String jti , UserEntity user) {
+    @Override
+    @Transactional
+    public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto refreshTokenRequestDto) {
+        log.info("ActionLog.refreshToken.start");
+        String token = refreshTokenRequestDto.getRefreshToken();
+
+        String jti;
+        try {
+            //CHECKSTYLE:OFF
+            jti = jwtUtils.extractJti(token);
+        } catch (Exception e) {
+            log.warn("ActionLog.refreshToken.invalidToken");
+            throw new ApplicationException(ErrorCode.INVALID_REFRESH_TOKEN);
+        } //CHECKSTYLE:ON
+
+        RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByJtiWithLock(jti)
+                .orElseThrow(() -> {
+                    log.warn("ActionLog.refreshToken.jtiNotFound");
+                    return new ApplicationException(ErrorCode.INVALID_CREDENTIALS);
+                });
+
+        if (refreshTokenEntity.isRevoked()) {
+            log.warn("ActionLog.refreshToken.revoked - REPLAY ATTACK DETECTED! jti: {}", jti);
+            refreshTokenRepository.revokeAllUserTokens(refreshTokenEntity.getUser().getId());
+            throw new ApplicationException(ErrorCode.INVALID_CREDENTIALS);
+        }
+        if (CommonUtils.isExpired(refreshTokenEntity.getExpiryDate())){
+            refreshTokenRepository.delete(refreshTokenEntity);
+            throw new ApplicationException(ErrorCode.INVALID_CREDENTIALS);
+        }
+
+        UserEntity user = refreshTokenEntity.getUser();
+        if (!jwtUtils.isTokenValid(token, user.getId())) {
+            throw new ApplicationException(ErrorCode.INVALID_CREDENTIALS);
+        }
+
+        String newAccessToken = jwtUtils.generateAccessToken(user);
+        JwtUtils.TokenWithJti newRefreshTokenData = jwtUtils.generateRefreshToken(user.getId());
+
+        refreshTokenEntity.setRevoked(true);
+        refreshTokenRepository.save(refreshTokenEntity);
+
+        saveRefreshTokenJti(newRefreshTokenData.jti(), user);
+
+        log.info("ActionLog.refreshToken.end");
+
+        return RefreshTokenResponseDto.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshTokenData.token())
+                .expiresIn(CommonUtils.calcTokenExpiration(jwtProperties.accessTokenExpiration()))
+                .build();
+    }
+
+    private void saveRefreshTokenJti(String jti, UserEntity user) {
         log.info("ActionLog.saveRefreshTokenJti.start");
         RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity();
         refreshTokenEntity.setJti(jti);
         refreshTokenEntity.setUser(user);
-        refreshTokenEntity.setExpiresAt(
+        refreshTokenEntity.setExpiryDate(
                 LocalDateTime.now().plusSeconds(CommonUtils.calcTokenExpiration(jwtProperties.refreshTokenExpiration()))
         );
         refreshTokenRepository.save(refreshTokenEntity);

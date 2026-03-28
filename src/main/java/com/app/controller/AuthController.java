@@ -1,7 +1,10 @@
 package com.app.controller;
 
+import com.app.model.dto.request.RefreshTokenRequestDto;
 import com.app.model.dto.request.SignInRequestDto;
 import com.app.model.dto.request.SignUpRequestDto;
+import com.app.model.dto.response.RefreshTokenResponseDto;
+import com.app.model.dto.response.SignInResponseDto;
 import com.app.model.dto.response.SignUpResponseDto;
 import com.app.service.AuthService;
 import jakarta.validation.Valid;
@@ -28,7 +31,12 @@ public class AuthController {
     }
 
     @PostMapping(path = "/sign-in")
-    public ResponseEntity<?> signIn(@RequestBody SignInRequestDto requestDto){
+    public ResponseEntity<SignInResponseDto> signIn(@RequestBody @Valid SignInRequestDto requestDto){
         return ResponseEntity.status(HttpStatus.OK).body(authService.signIn(requestDto));
+    }
+
+    @PostMapping(path = "/refresh-token")
+    public ResponseEntity<RefreshTokenResponseDto> refreshToken(@RequestBody @Valid RefreshTokenRequestDto requestDto){
+        return ResponseEntity.status(HttpStatus.OK).body(authService.refreshToken(requestDto));
     }
 }
