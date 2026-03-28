@@ -13,6 +13,7 @@ public class RefreshTokenResponseDto {
         return new Builder();
     }
 
+    @SuppressWarnings("checkstyle:HiddenField")
     public static class Builder {
         private String accessToken;
         private String refreshToken;

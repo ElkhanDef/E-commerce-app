@@ -73,8 +73,12 @@ public class RefreshTokenEntity extends BaseAuditEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof RefreshTokenEntity that)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RefreshTokenEntity that)) {
+            return false;
+        }
         return id != null && id.equals(that.id);
     }
 

@@ -53,15 +53,6 @@ public class UserEntity extends BaseAuditEntity {
     @Column(name = "role")
     private UserRole role;
 
-    @PrePersist
-    public void prePersist() {
-        this.isActive = true;
-        this.role = UserRole.CUSTOMER;
-    }
-
-    public UserEntity() {
-    }
-
     public UserEntity(AddressEntity address, String email, String lastName, String name, String password, String phoneNumber) {
         this.address = address;
         this.email = email;
@@ -69,6 +60,14 @@ public class UserEntity extends BaseAuditEntity {
         this.name = name;
         this.password = password;
         this.phoneNumber = phoneNumber;
+    }
+
+    public UserEntity() {}
+
+    @PrePersist
+    public void prePersist() {
+        this.isActive = true;
+        this.role = UserRole.CUSTOMER;
     }
 
     public Long getId() {

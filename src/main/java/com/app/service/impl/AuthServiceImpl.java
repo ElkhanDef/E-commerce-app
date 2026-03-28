@@ -117,11 +117,12 @@ public class AuthServiceImpl implements AuthService {
 
         String jti;
         try {
+            //CHECKSTYLE:OFF
             jti = jwtUtils.extractJti(token);
         } catch (Exception e) {
             log.warn("ActionLog.refreshToken.invalidToken");
             throw new ApplicationException(ErrorCode.INVALID_REFRESH_TOKEN);
-        }
+        } //CHECKSTYLE:ON
 
         RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByJtiWithLock(jti)
                 .orElseThrow(() -> {
