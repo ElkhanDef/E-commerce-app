@@ -6,8 +6,6 @@ import com.app.model.dto.request.SignUpRequestDto;
 import com.app.model.dto.response.RefreshTokenResponseDto;
 import com.app.model.dto.response.SignInResponseDto;
 import com.app.model.dto.response.SignUpResponseDto;
-import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestBody;
 
 public interface AuthService {
 
