@@ -4,7 +4,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 
 @EnableConfigurationProperties({
-        JwtProperties.class
+        JwtProperties.class,
+        AppProperties.class
 })
 @Configuration
 public class PropertiesConfig {

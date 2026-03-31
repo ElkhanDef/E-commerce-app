@@ -1,5 +1,6 @@
 package com.app.controller;
 
+import com.app.model.dto.request.ForgotPasswordRequestDto;
 import com.app.model.dto.request.RefreshTokenRequestDto;
 import com.app.model.dto.request.SignInRequestDto;
 import com.app.model.dto.request.SignUpRequestDto;
@@ -38,5 +39,11 @@ public class AuthController {
     @PostMapping(path = "/refresh-token")
     public ResponseEntity<RefreshTokenResponseDto> refreshToken(@RequestBody @Valid RefreshTokenRequestDto requestDto){
         return ResponseEntity.status(HttpStatus.OK).body(authService.refreshToken(requestDto));
+    }
+
+    @PostMapping(path = "/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDto requestDto){
+        authService.forgotPassword(requestDto);
+        return ResponseEntity.ok().build();
     }
 }
