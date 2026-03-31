@@ -1,20 +1,25 @@
 package com.app.service.impl;
 
+import com.app.config.AppProperties;
 import com.app.config.JwtProperties;
 import com.app.exception.ApplicationException;
 import com.app.exception.data.ErrorCode;
+import com.app.model.dto.request.ForgotPasswordRequestDto;
 import com.app.model.dto.request.RefreshTokenRequestDto;
 import com.app.model.dto.request.SignInRequestDto;
 import com.app.model.dto.request.SignUpRequestDto;
 import com.app.model.dto.response.RefreshTokenResponseDto;
 import com.app.model.dto.response.SignInResponseDto;
 import com.app.model.dto.response.SignUpResponseDto;
+import com.app.model.entity.PasswordResetTokenEntity;
 import com.app.model.entity.RefreshTokenEntity;
 import com.app.model.entity.UserEntity;
+import com.app.repository.PasswordResetTokenRepository;
 import com.app.repository.RefreshTokenRepository;
 import com.app.repository.UserRepository;
 import com.app.security.JwtUtils;
 import com.app.service.AuthService;
+import com.app.service.EmailSender;
 import com.app.utils.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -32,17 +39,26 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtils jwtUtils;
     private final JwtProperties jwtProperties;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final AppProperties appProperties;
+    private final EmailSender emailSender;
 
     public AuthServiceImpl(UserRepository userRepository,
                            JwtUtils jwtUtils,
                            PasswordEncoder passwordEncoder,
                            JwtProperties jwtProperties,
-                           RefreshTokenRepository refreshTokenRepository) {
+                           RefreshTokenRepository refreshTokenRepository,
+                           PasswordResetTokenRepository passwordResetTokenRepository,
+                           AppProperties appProperties,
+                           EmailSender emailSender) {
         this.userRepository = userRepository;
         this.jwtUtils = jwtUtils;
         this.passwordEncoder = passwordEncoder;
         this.jwtProperties = jwtProperties;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.appProperties = appProperties;
+        this.emailSender = emailSender;
     }
 
     @Override
@@ -160,6 +176,32 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(newRefreshTokenData.token())
                 .expiresIn(CommonUtils.calcTokenExpiration(jwtProperties.accessTokenExpiration()))
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void forgotPassword(ForgotPasswordRequestDto requestDto) {
+        log.info("ActionLog.forgotPassword.start");
+       Optional<UserEntity> userOpt =  userRepository.findByEmail(requestDto.getEmail());
+
+       if (userOpt.isEmpty()) {
+           log.warn("ActionLog.forgotPassword.end email not found");
+           return;
+       }
+       UserEntity user = userOpt.get();
+       String token = UUID.randomUUID().toString();
+
+       passwordResetTokenRepository.invalidateResetTokens(user.getId());
+        PasswordResetTokenEntity passwordResetTokenEntity = new PasswordResetTokenEntity();
+        passwordResetTokenEntity.setToken(token);
+        passwordResetTokenEntity.setUser(user);
+        passwordResetTokenEntity.setExpiryDate(LocalDateTime.now().plusMinutes(15));
+        passwordResetTokenEntity.setUsed(false);
+        passwordResetTokenRepository.save(passwordResetTokenEntity);
+
+        String resetLink = appProperties.frontendUrl() + "/reset-password?token=" + token;
+        emailSender.sendPasswordResetEmail(user.getEmail(), resetLink);
+        log.info("ActionLog.forgotPassword.end");
     }
 
     private void saveRefreshTokenJti(String jti, UserEntity user) {
