@@ -6,11 +6,13 @@ import com.app.exception.ApplicationException;
 import com.app.exception.data.ErrorCode;
 import com.app.model.dto.request.ForgotPasswordRequestDto;
 import com.app.model.dto.request.RefreshTokenRequestDto;
+import com.app.model.dto.request.ResetPasswordRequestDto;
 import com.app.model.dto.request.SignInRequestDto;
 import com.app.model.dto.request.SignUpRequestDto;
 import com.app.model.dto.response.RefreshTokenResponseDto;
 import com.app.model.dto.response.SignInResponseDto;
 import com.app.model.dto.response.SignUpResponseDto;
+import com.app.model.dto.response.TokenVerifyResponseDto;
 import com.app.model.entity.PasswordResetTokenEntity;
 import com.app.model.entity.RefreshTokenEntity;
 import com.app.model.entity.UserEntity;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -151,7 +154,7 @@ public class AuthServiceImpl implements AuthService {
             refreshTokenRepository.revokeAllUserTokens(refreshTokenEntity.getUser().getId());
             throw new ApplicationException(ErrorCode.INVALID_CREDENTIALS);
         }
-        if (CommonUtils.isExpired(refreshTokenEntity.getExpiryDate())){
+        if (CommonUtils.isExpired(refreshTokenEntity.getExpiryDate())) {
             refreshTokenRepository.delete(refreshTokenEntity);
             throw new ApplicationException(ErrorCode.INVALID_CREDENTIALS);
         }
@@ -182,16 +185,16 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void forgotPassword(ForgotPasswordRequestDto requestDto) {
         log.info("ActionLog.forgotPassword.start");
-       Optional<UserEntity> userOpt =  userRepository.findByEmail(requestDto.getEmail());
+        Optional<UserEntity> userOpt = userRepository.findByEmail(requestDto.getEmail());
 
-       if (userOpt.isEmpty()) {
-           log.warn("ActionLog.forgotPassword.end email not found");
-           return;
-       }
-       UserEntity user = userOpt.get();
-       String token = UUID.randomUUID().toString();
+        if (userOpt.isEmpty()) {
+            log.warn("ActionLog.forgotPassword.end email not found");
+            return;
+        }
+        UserEntity user = userOpt.get();
+        String token = UUID.randomUUID().toString();
 
-       passwordResetTokenRepository.invalidateResetTokens(user.getId());
+        passwordResetTokenRepository.invalidateResetTokens(user.getId());
         PasswordResetTokenEntity passwordResetTokenEntity = new PasswordResetTokenEntity();
         passwordResetTokenEntity.setToken(token);
         passwordResetTokenEntity.setUser(user);
@@ -202,6 +205,47 @@ public class AuthServiceImpl implements AuthService {
         String resetLink = appProperties.frontendUrl() + "/reset-password?token=" + token;
         emailSender.sendPasswordResetEmail(user.getEmail(), resetLink);
         log.info("ActionLog.forgotPassword.end");
+    }
+
+    @Override
+    public TokenVerifyResponseDto verifyReset(String token) {
+        log.info("ActionLog.verifyReset.start");
+        Optional<PasswordResetTokenEntity> tokenOpt = passwordResetTokenRepository.findByToken(token);
+
+        if (tokenOpt.isEmpty()) {
+            return TokenVerifyResponseDto.builder().isValid(false).build();
+        }
+        PasswordResetTokenEntity resetToken = tokenOpt.get();
+        LocalDateTime now = LocalDateTime.now();
+        boolean isOk = resetToken.getExpiryDate().isAfter(now) && !resetToken.isUsed();
+        log.info("ActionLog.verifyReset.end");
+        return TokenVerifyResponseDto.builder().isValid(isOk).build();
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(ResetPasswordRequestDto request) {
+        log.info("ActionLog.resetPassword.start");
+        PasswordResetTokenEntity resetToken = passwordResetTokenRepository.findByTokenWithUser(request.getToken())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TOKEN));
+
+        if (resetToken.isUsed()) {
+            throw new ApplicationException(ErrorCode.TOKEN_ALREADY_USED);
+        }
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ApplicationException(ErrorCode.TOKEN_EXPIRED);
+        }
+        if (passwordEncoder.matches(request.getNewPassword(), resetToken.getUser().getPassword())) {
+            throw new ApplicationException(ErrorCode.SAME_AS_OLD_PASSWORD);
+        }
+
+        UserEntity user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        resetToken.setUsed(true);
+        passwordResetTokenRepository.save(resetToken);
+        log.info("ActionLog.resetPassword.end");
     }
 
     private void saveRefreshTokenJti(String jti, UserEntity user) {
