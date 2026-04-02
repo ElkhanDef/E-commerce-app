@@ -6,16 +6,20 @@ public enum ErrorCode {
 
     //USER
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "Kullanıcı bulunamadı"),
-    USER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"Kullanıcı zaten mevcut"),
+    USER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "Kullanıcı zaten mevcut"),
 
     //AUTH
-    USER_NOT_VERIFIED(HttpStatus.UNAUTHORIZED,"Kullanıcı doğrulanmamış"),
+    USER_NOT_VERIFIED(HttpStatus.UNAUTHORIZED, "Kullanıcı doğrulanmamış"),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Geçersiz kimlik bilgileri"),
-    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED,"Geçersiz refresh token"),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Geçersiz refresh token"),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Geçersiz token"),
+    TOKEN_ALREADY_USED(HttpStatus.UNAUTHORIZED, "Token zaten kullanıldı"),
+    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "Token süresi doldu"),
 
 
     //VALIDATION
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "Doğrulama başarısız oldu"),
+    SAME_AS_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "Yeni şifreniz önceki şifrenizle aynı olamaz."),
 
     // GENERIC
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Sunucu hatası");
@@ -31,7 +35,8 @@ public enum ErrorCode {
     public HttpStatus getStatus() {
         return status;
     }
+
     public String getDefaultMessage() {
         return defaultMessage;
     }
-}
+    }
