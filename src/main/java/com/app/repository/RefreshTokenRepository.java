@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -20,4 +21,8 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT rt FROM RefreshTokenEntity rt WHERE rt.jti = :jti ")
     Optional<RefreshTokenEntity> findByJtiWithLock(String jti);
+
+    @Modifying
+    @Query("DELETE FROM RefreshTokenEntity rt WHERE rt.expiryDate < :date")
+    void deleteAllExpiredTokens(LocalDateTime date);
 }

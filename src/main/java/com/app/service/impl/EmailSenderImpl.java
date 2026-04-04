@@ -47,6 +47,23 @@ public class EmailSenderImpl implements EmailSender {
     }
 
     @Override
+    public void sendUserVerifyEmail(String email, String verifyLink) {
+        Context context = new Context();
+        context.setVariable("verifyLink", verifyLink);
+
+        String htmlContent = templateEngine.process("verify-user", context);
+
+        send(
+                EmailRequestDto.builder()
+                        .from(from)
+                        .to(email)
+                        .replyTo(from)
+                        .message(htmlContent)
+                        .subject("Hesabınızı doğrulayın")
+                        .build());
+    }
+
+    @Override
     public void send(EmailRequestDto request) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
