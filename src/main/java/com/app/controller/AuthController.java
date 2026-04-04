@@ -35,6 +35,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signUp(requestDto));
     }
 
+    @PostMapping(path = "/sign-up/verify")
+    public ResponseEntity<Void> verifyAccount(@RequestParam(name = "token" ) String token) {
+        authService.verifyAccount(token);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping(path = "/sign-in")
     public ResponseEntity<SignInResponseDto> signIn(@RequestBody @Valid SignInRequestDto requestDto){
         return ResponseEntity.status(HttpStatus.OK).body(authService.signIn(requestDto));
