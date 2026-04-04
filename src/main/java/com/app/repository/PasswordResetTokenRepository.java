@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -19,4 +20,8 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
 
     @Query("SELECT prt FROM PasswordResetTokenEntity prt JOIN FETCH prt.user WHERE prt.token = :token")
     Optional<PasswordResetTokenEntity> findByTokenWithUser(String token);
+
+    @Modifying
+    @Query("DELETE FROM PasswordResetTokenEntity prt WHERE prt.expiryDate < :date")
+    void deleteAllExpiredTokens(LocalDateTime date);
 }

@@ -13,9 +13,11 @@ import com.app.model.dto.response.RefreshTokenResponseDto;
 import com.app.model.dto.response.SignInResponseDto;
 import com.app.model.dto.response.SignUpResponseDto;
 import com.app.model.dto.response.TokenVerifyResponseDto;
+import com.app.model.entity.AccountVerifyTokenEntity;
 import com.app.model.entity.PasswordResetTokenEntity;
 import com.app.model.entity.RefreshTokenEntity;
 import com.app.model.entity.UserEntity;
+import com.app.repository.AccountVerifyTokenRepository;
 import com.app.repository.PasswordResetTokenRepository;
 import com.app.repository.RefreshTokenRepository;
 import com.app.repository.UserRepository;
@@ -42,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtProperties jwtProperties;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final AccountVerifyTokenRepository accountVerifyTokenRepository;
     private final AppProperties appProperties;
     private final EmailSender emailSender;
 
@@ -51,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
                            JwtProperties jwtProperties,
                            RefreshTokenRepository refreshTokenRepository,
                            PasswordResetTokenRepository passwordResetTokenRepository,
+                           AccountVerifyTokenRepository accountVerifyTokenRepository,
                            AppProperties appProperties,
                            EmailSender emailSender) {
         this.userRepository = userRepository;
@@ -59,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
         this.jwtProperties = jwtProperties;
         this.refreshTokenRepository = refreshTokenRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.accountVerifyTokenRepository = accountVerifyTokenRepository;
         this.appProperties = appProperties;
         this.emailSender = emailSender;
     }
@@ -77,8 +82,21 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(requestDto.getEmail());
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         user.setPhoneNumber(requestDto.getPhoneNumber());
-        user.setVerified(true); //FIXME: SEND EMAIL FOR VERIFY
+        user.setVerified(false);
         UserEntity savedUser = userRepository.save(user);
+
+        String token = UUID.randomUUID().toString();
+
+        AccountVerifyTokenEntity accountVerifyToken = new AccountVerifyTokenEntity();
+        accountVerifyToken.setToken(token);
+        accountVerifyToken.setExpiryDate(LocalDateTime.now().plusHours(24));
+        accountVerifyToken.setUser(savedUser);
+        accountVerifyToken.setUsed(false);
+        accountVerifyTokenRepository.save(accountVerifyToken);
+
+        String verifyLink = appProperties.frontendUrl() + "/verify-user/" + token;
+        emailSender.sendUserVerifyEmail(user.getEmail(),verifyLink);
+
         log.info("ActionLog.signUp.end");
 
         return SignUpResponseDto.builder()
@@ -88,6 +106,31 @@ public class AuthServiceImpl implements AuthService {
                 .email(savedUser.getEmail())
                 .phoneNumber(savedUser.getPhoneNumber())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void verifyAccount(String token) {
+        log.info("ActionLog.verifyAccount.start");
+        Optional<AccountVerifyTokenEntity> tokenOpt = accountVerifyTokenRepository.findByToken(token);
+
+        if (tokenOpt.isEmpty()){
+            throw new ApplicationException(ErrorCode.INVALID_TOKEN);
+        }
+        AccountVerifyTokenEntity tokenEntity = tokenOpt.get();
+        UserEntity user =  tokenEntity.getUser();
+
+        if (tokenEntity.isUsed()){
+            throw new ApplicationException(ErrorCode.TOKEN_ALREADY_USED);
+        }
+        if (tokenEntity.getExpiryDate().isBefore(LocalDateTime.now())){
+            throw new ApplicationException(ErrorCode.TOKEN_EXPIRED);
+        }
+        user.setVerified(true);
+        tokenEntity.setUsed(true);
+        userRepository.save(user);
+        accountVerifyTokenRepository.save(tokenEntity);
+        log.info("ActionLog.verifyAccount.end");
     }
 
     @Transactional
