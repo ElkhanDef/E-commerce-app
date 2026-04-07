@@ -6,11 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = AccountVerifyTokenEntity.TABLE_NAME)
 public class AccountVerifyTokenEntity {
+
+    public static final String TABLE_NAME = "account_verify_token";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +26,6 @@ public class AccountVerifyTokenEntity {
     @ManyToOne
     private UserEntity user;
 
-    @Column(name = "expiry_date")
     private LocalDateTime expiryDate;
 
     @Column(name = "is_used")
