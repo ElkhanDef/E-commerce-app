@@ -19,7 +19,10 @@ public enum ErrorCode {
 
     //VALIDATION
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "Doğrulama başarısız oldu"),
-    SAME_AS_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "Yeni şifreniz önceki şifrenizle aynı olamaz."),
+    SAME_AS_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "Yeni şifreniz önceki şifrenizle aynı olamaz"),
+
+    //CATEGORY
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND,"Kategori bulunamadı"),
 
     // GENERIC
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Sunucu hatası");

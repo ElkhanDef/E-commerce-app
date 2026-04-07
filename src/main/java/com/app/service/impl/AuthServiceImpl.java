@@ -115,15 +115,18 @@ public class AuthServiceImpl implements AuthService {
         Optional<AccountVerifyTokenEntity> tokenOpt = accountVerifyTokenRepository.findByToken(token);
 
         if (tokenOpt.isEmpty()){
+            log.warn("ActionLog.verifyAccount.Token Not Found");
             throw new ApplicationException(ErrorCode.INVALID_TOKEN);
         }
         AccountVerifyTokenEntity tokenEntity = tokenOpt.get();
         UserEntity user =  tokenEntity.getUser();
 
         if (tokenEntity.isUsed()){
+            log.warn("ActionLog.verifyAccount.token already used");
             throw new ApplicationException(ErrorCode.TOKEN_ALREADY_USED);
         }
         if (tokenEntity.getExpiryDate().isBefore(LocalDateTime.now())){
+            log.warn("ActionLog.verifyAccount.token expired");
             throw new ApplicationException(ErrorCode.TOKEN_EXPIRED);
         }
         user.setVerified(true);
