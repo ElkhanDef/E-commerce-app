@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring",unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface CategoryMapper {
 
     CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
@@ -24,7 +24,8 @@ public interface CategoryMapper {
             @Mapping(target = "updatedAt", ignore = true),
             @Mapping(target = "createdBy", ignore = true),
             @Mapping(target = "updatedBy", ignore = true),
-            @Mapping(target = "id", ignore = true)
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "products", ignore = true)
     })
     CategoryEntity toEntity(CategoryRequestDto dto);
 
@@ -33,7 +34,8 @@ public interface CategoryMapper {
             @Mapping(target = "updatedAt", ignore = true),
             @Mapping(target = "createdBy", ignore = true),
             @Mapping(target = "updatedBy", ignore = true),
-            @Mapping(target = "id", ignore = true)
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "products", ignore = true)
     })
     CategoryEntity update(CategoryRequestDto requestDto, @MappingTarget CategoryEntity categoryEntity);
 
