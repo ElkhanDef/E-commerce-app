@@ -57,5 +57,5 @@ VALUES ('İznik Desenli Tabak', 520.00, 9, 'KTC-IZN-001', 'Özgün İznik desenl
 
 -- Admin (created_at, updated_at əlavə et)
 INSERT INTO users (name, last_name, email, password, phone_number, is_active, is_verified, role, created_at, updated_at)
-VALUES ('Admin', 'Kütahya', 'admin@kutahya.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5E',
+VALUES ('Ekrem', 'Abi', 'admin@kutahya.com', '$2a$12$DF3Wje209NG0zKtWUEOOi.zhK26Yb4spDLPG8HYH17OjRJHWXkgQa',
         '05551234567', true, true, 'ADMIN', NOW(), NOW());
