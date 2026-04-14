@@ -4,7 +4,7 @@ import com.app.exception.ApplicationException;
 import com.app.exception.data.ErrorCode;
 import com.app.mapper.CategoryMapper;
 import com.app.model.dto.request.CategoryRequestDto;
-import com.app.model.dto.request.CategoryResponseDto;
+import com.app.model.dto.response.CategoryResponseDto;
 import com.app.model.entity.CategoryEntity;
 import com.app.repository.CategoryRepository;
 import com.app.service.CategoryService;

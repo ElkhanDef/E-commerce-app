@@ -23,6 +23,9 @@ public class CategoryEntity extends BaseAuditEntity{
     @Column(name = "name")
     private String name;
 
+    @Column(name = "slug")
+    private String slug;
+
     @OneToMany(mappedBy = "category")
     private List<ProductEntity> products;
 
@@ -31,6 +34,14 @@ public class CategoryEntity extends BaseAuditEntity{
     }
 
     public CategoryEntity() {}
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
 
     public List<ProductEntity> getProducts() {
         return products;
