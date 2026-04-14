@@ -1,19 +1,23 @@
-package com.app.model.dto.request;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+package com.app.model.dto.response;
 
 public class CategoryResponseDto {
 
-    @NotBlank(message = "Kategori ismi boş olamaz")
-    @Size(min = 2, max = 50, message = "Kategori ismi 2-50 karakter arasında olmalıdır")
     private String name;
+    private String slug;
 
     public CategoryResponseDto(String name) {
         this.name = name;
     }
 
     public CategoryResponseDto() {}
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
 
     public String getName() {
         return name;

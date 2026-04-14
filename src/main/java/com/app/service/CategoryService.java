@@ -1,7 +1,7 @@
 package com.app.service;
 
 import com.app.model.dto.request.CategoryRequestDto;
-import com.app.model.dto.request.CategoryResponseDto;
+import com.app.model.dto.response.CategoryResponseDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

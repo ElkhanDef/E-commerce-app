@@ -1,7 +1,7 @@
 package com.app.controller;
 
 import com.app.model.dto.request.CategoryRequestDto;
-import com.app.model.dto.request.CategoryResponseDto;
+import com.app.model.dto.response.CategoryResponseDto;
 import com.app.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

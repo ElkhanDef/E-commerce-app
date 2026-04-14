@@ -1,5 +1,6 @@
 package com.app.model.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -8,9 +9,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = ProductEntity.TABLE_NAME)
@@ -31,11 +35,14 @@ public class ProductEntity extends BaseAuditEntity {
     @Column(name = "stock")
     private Integer stock;
 
-    @Column(name = "stock_keeping_unit",unique = true)
+    @Column(name = "stock_keeping_unit", unique = true)
     private String sku;
 
     @Column(name = "description")
     private String description;
+
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<ProductImageEntity> images;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -46,18 +53,18 @@ public class ProductEntity extends BaseAuditEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o){
+        if (this == o) {
             return true;
         }
-        if (!(o instanceof ProductEntity that)){
+        if (!(o instanceof ProductEntity that)) {
             return false;
         }
-        return getId().equals(that.getId());
+        return id != null && Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hashCode(id);
     }
 
     public Long getId() {
@@ -70,6 +77,14 @@ public class ProductEntity extends BaseAuditEntity {
 
     public String getSlug() {
         return slug;
+    }
+
+    public List<ProductImageEntity> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ProductImageEntity> images) {
+        this.images = images;
     }
 
     public void setSlug(String slug) {
