@@ -130,8 +130,7 @@ public class ProductServiceImpl implements ProductService {
                                 .errorCode("IMAGE_UPLOAD_FAILED")
                                 .build()
                 );
-            }
-            //CHECKSTYLE:ON
+            } //CHECKSTYLE:ON
         }
         productImageRepository.saveAll(productImages);
         //product.getImages().addAll(productImages);
