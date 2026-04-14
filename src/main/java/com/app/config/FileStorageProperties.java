@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record FileStorageProperties(
         String endpoint,
         String accessKey,
-        String secretKey
+        String secretKey,
+        String bucket
 ) {
 }

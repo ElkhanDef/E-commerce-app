@@ -6,6 +6,7 @@ import com.app.mapper.CategoryMapper;
 import com.app.model.dto.request.CategoryRequestDto;
 import com.app.model.dto.response.CategoryResponseDto;
 import com.app.model.entity.CategoryEntity;
+import com.app.model.enums.SlugTarget;
 import com.app.repository.CategoryRepository;
 import com.app.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,11 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final SlugGeneratorService slugGenerator;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository,SlugGeneratorService slugGenerator) {
         this.categoryRepository = categoryRepository;
+        this.slugGenerator = slugGenerator;
     }
 
     @Override
@@ -29,6 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponseDto create(CategoryRequestDto request) {
         log.info("ActionLog.create.start");
         CategoryEntity categoryEntity = CategoryMapper.INSTANCE.toEntity(request);
+        categoryEntity.setSlug(slugGenerator.generateUniqueSlug(request.getName(), SlugTarget.CATEGORY));
         CategoryEntity savedCategory = categoryRepository.save(categoryEntity);
         log.info("ActionLog.create.end");
         return CategoryMapper.INSTANCE.toDto(savedCategory);
