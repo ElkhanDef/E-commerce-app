@@ -12,12 +12,6 @@ import java.util.Set;
 @Component
 public class ImageFileValidator {
 
-    private final FileProperties fileProperties;
-
-    public ImageFileValidator(FileProperties fileProperties) {
-        this.fileProperties = fileProperties;
-    }
-
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
             "image/jpeg",
             "image/png"
@@ -26,6 +20,12 @@ public class ImageFileValidator {
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
             ".jpg", ".jpeg", ".png"
     );
+
+    private final FileProperties fileProperties;
+
+    public ImageFileValidator(FileProperties fileProperties) {
+        this.fileProperties = fileProperties;
+    }
 
     public void validateImageFiles(List<MultipartFile> imageFiles) {
 
