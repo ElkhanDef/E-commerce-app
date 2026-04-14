@@ -36,7 +36,7 @@ public class PartialImageUploadResponseDto {
     public int getTotalFailed() {return totalFailed;}
     public void setTotalFailed(int totalFailed) {this.totalFailed = totalFailed;}
 
-    @SuppressWarnings("checksytle:HiddenField")
+    @SuppressWarnings("checkstyle:HiddenField")
     public static class Builder {
         private Long productId;
         private List<UploadedImageDto> uploaded;
