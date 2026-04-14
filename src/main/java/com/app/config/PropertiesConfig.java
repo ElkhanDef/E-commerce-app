@@ -5,7 +5,9 @@ import org.springframework.context.annotation.Configuration;
 
 @EnableConfigurationProperties({
         JwtProperties.class,
-        AppProperties.class
+        AppProperties.class,
+        FileStorageProperties.class,
+        FileProperties.class
 })
 @Configuration
 public class PropertiesConfig {
