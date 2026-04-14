@@ -88,26 +88,28 @@ public class ProductServiceImpl implements ProductService {
         List<UploadedImageDto> uploadedList = new ArrayList<>();
         List<FailedImageDto> failedList = new ArrayList<>();
 
+        String bucket = fileStorageProperties.bucket();
+
         for (MultipartFile image : images) {
             String fileName = image.getOriginalFilename();
+            String uniqueFileName = CommonUtils.generateUniqueImageName(fileName);
 
             try {
                 imageValidator.validateImage(image);
-                String path = productId + "/" +
-                        CommonUtils.generateUniqueImageName(fileName);
+                String path = bucket + "/" + productId + "/" + uniqueFileName;
 
                 minioClient.putObject(
                         PutObjectArgs.builder()
                                 .stream(image.getInputStream(), image.getSize(), -1)
                                 .object(path)
                                 .contentType(image.getContentType())
-                                .bucket("products")
+                                .bucket(bucket)
                                 .build()
                 );
                 ProductImageEntity entity = new ProductImageEntity(
                         path,
                         false,
-                        fileName,
+                        uniqueFileName,
                         product
                 );
                 productImages.add(entity);
@@ -115,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
             } catch (ApplicationException ex) {
                 failedList.add(
                         FailedImageDto.builder()
-                                .filename(fileName)
+                                .filename(uniqueFileName)
                                 .error(ex.getMessage())
                                 .errorCode(ex.getErrorCode().name())
                                 .build()
@@ -125,7 +127,7 @@ public class ProductServiceImpl implements ProductService {
                 log.error("ActionLog.uploadImages.Image upload failed", ex);
                 failedList.add(
                         FailedImageDto.builder()
-                                .filename(fileName)
+                                .filename(uniqueFileName)
                                 .error("Upload failed")
                                 .errorCode("IMAGE_UPLOAD_FAILED")
                                 .build()
