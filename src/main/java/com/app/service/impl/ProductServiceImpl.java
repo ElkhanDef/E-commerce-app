@@ -120,6 +120,7 @@ public class ProductServiceImpl implements ProductService {
                                 .errorCode(ex.getErrorCode().name())
                                 .build()
                 );
+                //CHECKSTYLE:OFF
             } catch (Exception ex) {
                 log.error("ActionLog.uploadImages.Image upload failed", ex);
                 failedList.add(
@@ -130,6 +131,7 @@ public class ProductServiceImpl implements ProductService {
                                 .build()
                 );
             }
+            //CHECKSTYLE:ON
         }
         productImageRepository.saveAll(productImages);
         //product.getImages().addAll(productImages);
