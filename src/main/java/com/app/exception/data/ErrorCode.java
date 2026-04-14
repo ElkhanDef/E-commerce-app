@@ -22,7 +22,21 @@ public enum ErrorCode {
     SAME_AS_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "Yeni şifreniz önceki şifrenizle aynı olamaz"),
 
     //CATEGORY
-    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND,"Kategori bulunamadı"),
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "Kategori bulunamadı"),
+
+    //PRODUCT
+    IMAGE_UPLOAD_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "Resim yükleme başarısız oldu"),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "Ürün bulunamadı"),
+
+    //IMAGE VALIDATION
+    FILE_EMPTY(HttpStatus.BAD_REQUEST, "Dosya boş olamaz"),
+    INVALID_FILENAME(HttpStatus.BAD_REQUEST, "Dosya adı geçersiz"),
+    FILE_TOO_LARGE(HttpStatus.valueOf(413), "Dosya boyutu 5MB'dan büyük olamaz"),
+    INVALID_FILE_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Sadece resim dosyaları (JPEG, PNG, JPG) kabul edilir"),
+    INVALID_FILE_EXTENSION(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Dosya uzantısı desteklenmiyor"),
+    TOO_MANY_IMAGES(HttpStatus.BAD_REQUEST, "Çok fazla görsel yüklenemez"),
+    NO_IMAGES_PROVIDED(HttpStatus.BAD_REQUEST, "Hiç görsel sağlanmadı"),
+
 
     // GENERIC
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Sunucu hatası");
@@ -42,4 +56,4 @@ public enum ErrorCode {
     public String getDefaultMessage() {
         return defaultMessage;
     }
-    }
+}

@@ -1,6 +1,6 @@
 package com.app.controller;
 
-import com.app.model.dto.request.CategoryResponseDto;
+import com.app.model.dto.response.CategoryResponseDto;
 import com.app.service.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

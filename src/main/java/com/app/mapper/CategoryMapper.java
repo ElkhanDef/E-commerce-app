@@ -1,7 +1,7 @@
 package com.app.mapper;
 
 import com.app.model.dto.request.CategoryRequestDto;
-import com.app.model.dto.request.CategoryResponseDto;
+import com.app.model.dto.response.CategoryResponseDto;
 import com.app.model.entity.CategoryEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,7 +25,8 @@ public interface CategoryMapper {
             @Mapping(target = "createdBy", ignore = true),
             @Mapping(target = "updatedBy", ignore = true),
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "products", ignore = true)
+            @Mapping(target = "products", ignore = true),
+            @Mapping(target = "slug", ignore = true)
     })
     CategoryEntity toEntity(CategoryRequestDto dto);
 
@@ -35,7 +36,8 @@ public interface CategoryMapper {
             @Mapping(target = "createdBy", ignore = true),
             @Mapping(target = "updatedBy", ignore = true),
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "products", ignore = true)
+            @Mapping(target = "products", ignore = true),
+            @Mapping(target = "slug", ignore = true)
     })
     CategoryEntity update(CategoryRequestDto requestDto, @MappingTarget CategoryEntity categoryEntity);
 
