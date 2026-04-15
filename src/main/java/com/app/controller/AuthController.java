@@ -36,35 +36,41 @@ public class AuthController {
     }
 
     @PostMapping(path = "/sign-up/verify")
-    public ResponseEntity<Void> verifyAccount(@RequestParam(name = "token" ) String token) {
+    public ResponseEntity<Void> verifyAccount(@RequestParam(name = "token") String token) {
         authService.verifyAccount(token);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(path = "/sign-in")
-    public ResponseEntity<SignInResponseDto> signIn(@RequestBody @Valid SignInRequestDto requestDto){
+    public ResponseEntity<SignInResponseDto> signIn(@RequestBody @Valid SignInRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.signIn(requestDto));
     }
 
     @PostMapping(path = "/refresh-token")
-    public ResponseEntity<RefreshTokenResponseDto> refreshToken(@RequestBody @Valid RefreshTokenRequestDto requestDto){
+    public ResponseEntity<RefreshTokenResponseDto> refreshToken(@RequestBody @Valid RefreshTokenRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.refreshToken(requestDto));
     }
 
     @PostMapping(path = "/forgot-password")
-    public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDto requestDto){
+    public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDto requestDto) {
         authService.forgotPassword(requestDto);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping(path = "/reset-password/verify")
-    public ResponseEntity<TokenVerifyResponseDto> resetPassword(@RequestParam(name = "token") String token){
+    public ResponseEntity<TokenVerifyResponseDto> resetPassword(@RequestParam(name = "token") String token) {
         return ResponseEntity.ok(authService.verifyReset(token));
     }
 
     @PostMapping(path = "/reset-password")
-    public ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordRequestDto request){
+    public ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordRequestDto request) {
         authService.resetPassword(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(path = "sign-out")
+    public ResponseEntity<Void> signOut() {
+        authService.signOut();
         return ResponseEntity.ok().build();
     }
 }

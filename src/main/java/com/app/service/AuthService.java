@@ -19,4 +19,5 @@ public interface AuthService {
     TokenVerifyResponseDto verifyReset(String token);
     void resetPassword(ResetPasswordRequestDto requestDto);
     void verifyAccount(String token);
+    void signOut();
 }
