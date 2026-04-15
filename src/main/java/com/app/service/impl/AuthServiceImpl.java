@@ -26,6 +26,8 @@ import com.app.service.AuthService;
 import com.app.service.EmailSender;
 import com.app.utils.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
         accountVerifyTokenRepository.save(accountVerifyToken);
 
         String verifyLink = appProperties.frontendUrl() + "/verify-user/" + token;
-        emailSender.sendUserVerifyEmail(user.getEmail(),verifyLink);
+        emailSender.sendUserVerifyEmail(user.getEmail(), verifyLink);
 
         log.info("ActionLog.signUp.end");
 
@@ -114,18 +116,18 @@ public class AuthServiceImpl implements AuthService {
         log.info("ActionLog.verifyAccount.start");
         Optional<AccountVerifyTokenEntity> tokenOpt = accountVerifyTokenRepository.findByToken(token);
 
-        if (tokenOpt.isEmpty()){
+        if (tokenOpt.isEmpty()) {
             log.warn("ActionLog.verifyAccount.Token Not Found");
             throw new ApplicationException(ErrorCode.INVALID_TOKEN);
         }
         AccountVerifyTokenEntity tokenEntity = tokenOpt.get();
-        UserEntity user =  tokenEntity.getUser();
+        UserEntity user = tokenEntity.getUser();
 
-        if (tokenEntity.isUsed()){
+        if (tokenEntity.isUsed()) {
             log.warn("ActionLog.verifyAccount.token already used");
             throw new ApplicationException(ErrorCode.TOKEN_ALREADY_USED);
         }
-        if (tokenEntity.getExpiryDate().isBefore(LocalDateTime.now())){
+        if (tokenEntity.getExpiryDate().isBefore(LocalDateTime.now())) {
             log.warn("ActionLog.verifyAccount.token expired");
             throw new ApplicationException(ErrorCode.TOKEN_EXPIRED);
         }
@@ -291,6 +293,22 @@ public class AuthServiceImpl implements AuthService {
         resetToken.setUsed(true);
         passwordResetTokenRepository.save(resetToken);
         log.info("ActionLog.resetPassword.end");
+    }
+
+    @Override
+    @Transactional
+    public void signOut() {
+        log.info("ActionLog.signOut.start");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            log.warn("ActionLog.signOut.User not authenticated");
+            return;
+        }
+        Long userId = Long.valueOf(auth.getName());
+
+        refreshTokenRepository.revokeAllUserTokens(userId);
+        log.info("ActionLog.signOut.end");
     }
 
     private void saveRefreshTokenJti(String jti, UserEntity user) {
