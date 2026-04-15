@@ -147,6 +147,7 @@ public class ProductServiceImpl implements ProductService {
                             .build()
             );
         }
+        log.info("ActionLog.uploadImages.end");
         return PartialImageUploadResponseDto.builder()
                 .productId(productId)
                 .uploaded(uploadedList)
