@@ -5,9 +5,11 @@ import com.app.exception.ApplicationException;
 import com.app.exception.data.ErrorCode;
 import com.app.mapper.CategoryMapper;
 import com.app.mapper.ProductMapper;
+import com.app.model.dto.request.PageableRequest;
 import com.app.model.dto.request.ProductRequestDto;
 import com.app.model.dto.response.FailedImageDto;
 import com.app.model.dto.response.PartialImageUploadResponseDto;
+import com.app.model.dto.response.ProductListResponseDto;
 import com.app.model.dto.response.ProductResponseDto;
 import com.app.model.dto.response.UploadedImageDto;
 import com.app.model.entity.CategoryEntity;
@@ -23,6 +25,8 @@ import com.app.validator.ImageFileValidator;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -155,5 +159,13 @@ public class ProductServiceImpl implements ProductService {
                 .totalUploaded(uploadedList.size())
                 .totalFailed(failedList.size())
                 .build();
+    }
+
+    @Override
+    public Page<ProductListResponseDto> getAllProducts(PageableRequest request) {
+        log.info("ActionLog.getAllProducts.start");
+        Pageable pageable = request.toPageable();
+        log.info("ActionLog.getAllProducts.end");
+        return productRepository.findAll(pageable).map(ProductMapper.INSTANCE::toDtoList);
     }
 }
