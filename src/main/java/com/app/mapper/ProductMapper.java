@@ -1,6 +1,7 @@
 package com.app.mapper;
 
 import com.app.model.dto.request.ProductRequestDto;
+import com.app.model.dto.response.ProductListResponseDto;
 import com.app.model.dto.response.ProductResponseDto;
 import com.app.model.entity.ProductEntity;
 import org.mapstruct.Mapper;
@@ -32,4 +33,6 @@ public interface ProductMapper {
             @Mapping(target = "mainImageUrl", ignore = true)
     })
     ProductResponseDto toDto(ProductEntity productEntity);
+
+    ProductListResponseDto toDtoList(ProductEntity productEntity);
 }
