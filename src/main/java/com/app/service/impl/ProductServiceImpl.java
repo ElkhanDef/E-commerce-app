@@ -168,4 +168,29 @@ public class ProductServiceImpl implements ProductService {
         log.info("ActionLog.getAllProducts.end");
         return productRepository.findAll(pageable).map(ProductMapper.INSTANCE::toDtoList);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProductResponseDto getProductById(Long productId) {
+        log.info("ActionLog.getProductById.start");
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        List<String> imageUrls = new ArrayList<>();
+        String mainImageUrl = null;
+
+        for (ProductImageEntity entity : product.getImages()) {
+            imageUrls.add(fileStorageProperties.endpoint() + "/" + entity.getImagePath());
+            if (entity.isMain()) {
+                mainImageUrl = fileStorageProperties.endpoint() + "/" + entity.getImagePath();
+            }
+        }
+
+        ProductResponseDto response = ProductMapper.INSTANCE.toDto(product);
+        response.setCategoryResponse(CategoryMapper.INSTANCE.toDto(product.getCategory()));
+        response.setImageUrls(imageUrls);
+        response.setMainImageUrl(mainImageUrl);
+        log.info("ActionLog.getProductById.end");
+        return response;
+    }
 }
