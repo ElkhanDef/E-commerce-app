@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,18 +39,21 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProducts(req));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProductResponseDto> createProduct(@RequestBody @Valid ProductRequestDto productRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(productRequestDto));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(path = "/{productId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PartialImageUploadResponseDto> uploadImages(@PathVariable Long productId,
                                                                       @RequestParam("files") List<MultipartFile> files) {
         return ResponseEntity.ok(productService.uploadImages(productId, files));
     }
 
-    @GetMapping(path = "/id/{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(path = "/{productId}")
     public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long productId) {
         return ResponseEntity.ok(productService.getProductById(productId));
     }
