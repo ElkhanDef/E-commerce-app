@@ -16,4 +16,5 @@ public interface ProductService {
     PartialImageUploadResponseDto uploadImages(Long productId, List<MultipartFile> images);
     Page<ProductListResponseDto> getAllProducts(PageableRequest request);
     ProductResponseDto getProductById(Long productId);
+    ProductResponseDto selectMainImage(Long productId, Long imageId);
 }
