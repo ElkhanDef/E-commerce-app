@@ -194,6 +194,15 @@ public class ProductServiceImpl implements ProductService {
         return buildProductResponse(product);
     }
 
+    @Override
+    public ProductResponseDto getProductBySlug(String slug) {
+        log.info("ActionLog.getProductBySlug.start");
+        ProductEntity product = productRepository.findBySlug(slug)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND));
+        log.info("ActionLog.getProductBySlug.end");
+        return buildProductResponse(product);
+    }
+
     private ProductResponseDto buildProductResponse(ProductEntity product) {
         log.info("ProductResponseDto.buildProductResponse.start");
         String baseUrl = fileStorageProperties.endpoint() + "/";
