@@ -50,6 +50,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/products").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/products/*").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/categories").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/categories/*").permitAll()
                                 .anyRequest().authenticated())
 
                 .sessionManagement(session -> session
