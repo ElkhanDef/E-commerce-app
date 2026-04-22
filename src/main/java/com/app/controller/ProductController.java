@@ -40,6 +40,11 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProducts(req));
     }
 
+    @GetMapping(path = "/{slug}")
+    public ResponseEntity<ProductResponseDto> getProduct(@PathVariable String slug) {
+        return ResponseEntity.ok(productService.getProductBySlug(slug));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProductResponseDto> createProduct(@RequestBody @Valid ProductRequestDto productRequestDto) {
@@ -54,7 +59,7 @@ public class ProductController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(path = "/{productId}")
+    @GetMapping(path = "/id/{productId}")
     public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long productId) {
         return ResponseEntity.ok(productService.getProductById(productId));
     }

@@ -17,4 +17,5 @@ public interface ProductService {
     Page<ProductListResponseDto> getAllProducts(PageableRequest request);
     ProductResponseDto getProductById(Long productId);
     ProductResponseDto selectMainImage(Long productId, Long imageId);
+    ProductResponseDto getProductBySlug(String slug);
 }
