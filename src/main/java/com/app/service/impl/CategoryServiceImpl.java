@@ -59,6 +59,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public CategoryResponseDto getCategoryBySlug(String slug) {
+        log.info("ActionLog.getCategoryBySlug.start");
+        CategoryEntity category = categoryRepository.findBySlug(slug)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.CATEGORY_NOT_FOUND));
+        log.info("ActionLog.getCategoryBySlug.end");
+        return CategoryMapper.INSTANCE.toDto(category);
+    }
+
+    @Override
     public List<CategoryResponseDto> getAllCategories() {
         log.info("ActionLog.getAllCategories.start");
         List<CategoryEntity> categories = categoryRepository.findAll();
