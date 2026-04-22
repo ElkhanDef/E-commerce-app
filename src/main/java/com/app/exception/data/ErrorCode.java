@@ -27,6 +27,7 @@ public enum ErrorCode {
     //PRODUCT
     IMAGE_UPLOAD_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "Resim yükleme başarısız oldu"),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "Ürün bulunamadı"),
+    IMAGE_NOT_BELONG_TO_PRODUCT(HttpStatus.BAD_REQUEST, "Görsel belirtilen ürüne ait değil"),
 
     //IMAGE VALIDATION
     FILE_EMPTY(HttpStatus.BAD_REQUEST, "Dosya boş olamaz"),
@@ -36,6 +37,7 @@ public enum ErrorCode {
     INVALID_FILE_EXTENSION(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Dosya uzantısı desteklenmiyor"),
     TOO_MANY_IMAGES(HttpStatus.BAD_REQUEST, "Çok fazla görsel yüklenemez"),
     NO_IMAGES_PROVIDED(HttpStatus.BAD_REQUEST, "Hiç görsel sağlanmadı"),
+    FILE_NOT_FOUND(HttpStatus.NOT_FOUND,"Dosya bulunamadı"),
 
 
     // GENERIC

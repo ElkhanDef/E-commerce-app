@@ -175,14 +175,38 @@ public class ProductServiceImpl implements ProductService {
         log.info("ActionLog.getProductById.start");
         ProductEntity product = productRepository.findById(productId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND));
+        log.info("ActionLog.getProductById.end");
+        return buildProductResponse(product);
+    }
+
+    @Override
+    @Transactional
+    public ProductResponseDto selectMainImage(Long productId, Long imageId) {
+        log.info("ActionLog.selectMainImage.start");
+        productImageRepository.unsetAllMainImages(productId);
+        int changedRow = productImageRepository.setMainImage(productId, imageId);
+
+        if (changedRow == 0) {
+            throw new ApplicationException(ErrorCode.IMAGE_NOT_BELONG_TO_PRODUCT);
+        }
+        ProductEntity product = productRepository.findById(productId).get();
+        log.info("ActionLog.selectMainImage.end");
+        return buildProductResponse(product);
+    }
+
+    private ProductResponseDto buildProductResponse(ProductEntity product) {
+        log.info("ProductResponseDto.buildProductResponse.start");
+        String baseUrl = fileStorageProperties.endpoint() + "/";
 
         List<String> imageUrls = new ArrayList<>();
         String mainImageUrl = null;
 
-        for (ProductImageEntity entity : product.getImages()) {
-            imageUrls.add(fileStorageProperties.endpoint() + "/" + entity.getImagePath());
-            if (entity.isMain()) {
-                mainImageUrl = fileStorageProperties.endpoint() + "/" + entity.getImagePath();
+        for (ProductImageEntity image : product.getImages()) {
+            String fullUrl = baseUrl + image.getImagePath();
+            imageUrls.add(fullUrl);
+
+            if(image.isMain()) {
+                mainImageUrl = fullUrl;
             }
         }
 
@@ -190,7 +214,7 @@ public class ProductServiceImpl implements ProductService {
         response.setCategoryResponse(CategoryMapper.INSTANCE.toDto(product.getCategory()));
         response.setImageUrls(imageUrls);
         response.setMainImageUrl(mainImageUrl);
-        log.info("ActionLog.getProductById.end");
+        log.info("ProductResponseDto.buildProductResponse.end");
         return response;
     }
 }
