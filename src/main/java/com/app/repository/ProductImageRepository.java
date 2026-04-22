@@ -2,8 +2,18 @@ package com.app.repository;
 
 import com.app.model.entity.ProductImageEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductImageRepository extends JpaRepository<ProductImageEntity, Long> {
+
+    @Modifying
+    @Query("UPDATE ProductImageEntity pi SET pi.isMain = false WHERE pi.product.id = :productId")
+    void unsetAllMainImages(Long productId);
+
+    @Modifying
+    @Query("UPDATE ProductImageEntity pi SET pi.isMain = true WHERE pi.product.id = :productId AND pi.id = :imageId")
+    int setMainImage(Long productId, Long imageId);
 }

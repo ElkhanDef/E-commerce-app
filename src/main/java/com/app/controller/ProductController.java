@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,5 +57,12 @@ public class ProductController {
     @GetMapping(path = "/{productId}")
     public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long productId) {
         return ResponseEntity.ok(productService.getProductById(productId));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{productId}/images/{imageId}/main")
+    public ResponseEntity<ProductResponseDto> selectMainImage(@PathVariable Long productId,
+                                                              @PathVariable Long imageId) {
+        return ResponseEntity.ok(productService.selectMainImage(productId, imageId));
     }
 }
