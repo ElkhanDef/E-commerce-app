@@ -203,6 +203,15 @@ public class ProductServiceImpl implements ProductService {
         return buildProductResponse(product);
     }
 
+    @Override
+    public void deleteProductById(Long id) {
+        log.info("ActionLog.deleteProductById.start");
+        ProductEntity product = productRepository.findById(id)
+                        .orElseThrow(() -> new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND));
+        productRepository.delete(product);
+        log.info("ActionLog.deleteProductById.end");
+    }
+
     private ProductResponseDto buildProductResponse(ProductEntity product) {
         log.info("ProductResponseDto.buildProductResponse.start");
         String baseUrl = fileStorageProperties.endpoint() + "/";
