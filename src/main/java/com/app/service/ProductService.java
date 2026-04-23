@@ -18,4 +18,5 @@ public interface ProductService {
     ProductResponseDto getProductById(Long productId);
     ProductResponseDto selectMainImage(Long productId, Long imageId);
     ProductResponseDto getProductBySlug(String slug);
+    void deleteProductById(Long id);
 }
