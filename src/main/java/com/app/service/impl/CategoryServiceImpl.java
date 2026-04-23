@@ -50,6 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.INSTANCE.toDto(savedCategory);
     }
 
+    @Override
     public CategoryResponseDto getCategoryById(Long categoryId) {
         log.info("ActionLog.getCategoryById.start");
         CategoryEntity category = categoryRepository.findById(categoryId)
@@ -65,6 +66,15 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new ApplicationException(ErrorCode.CATEGORY_NOT_FOUND));
         log.info("ActionLog.getCategoryBySlug.end");
         return CategoryMapper.INSTANCE.toDto(category);
+    }
+
+    @Override
+    public void deleteCategoryById(Long categoryId) {
+        log.info("ActionLog.deleteCategoryById.start");
+        CategoryEntity category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.CATEGORY_NOT_FOUND));
+        categoryRepository.delete(category);
+        log.info("ActionLog.deleteCategoryById.end");
     }
 
     @Override
