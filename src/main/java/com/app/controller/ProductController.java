@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -69,5 +70,12 @@ public class ProductController {
     public ResponseEntity<ProductResponseDto> selectMainImage(@PathVariable Long productId,
                                                               @PathVariable Long imageId) {
         return ResponseEntity.ok(productService.selectMainImage(productId, imageId));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Void> deleteProductById(@PathVariable Long id) {
+        productService.deleteProductById(id);
+        return ResponseEntity.noContent().build();
     }
 }
