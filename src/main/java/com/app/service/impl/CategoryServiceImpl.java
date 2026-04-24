@@ -51,6 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryResponseDto getCategoryById(Long categoryId) {
         log.info("ActionLog.getCategoryById.start");
         CategoryEntity category = categoryRepository.findById(categoryId)
@@ -60,6 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryResponseDto getCategoryBySlug(String slug) {
         log.info("ActionLog.getCategoryBySlug.start");
         CategoryEntity category = categoryRepository.findBySlug(slug)
@@ -69,6 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteCategoryById(Long categoryId) {
         log.info("ActionLog.deleteCategoryById.start");
         CategoryEntity category = categoryRepository.findById(categoryId)
@@ -78,6 +81,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryResponseDto> getAllCategories() {
         log.info("ActionLog.getAllCategories.start");
         List<CategoryEntity> categories = categoryRepository.findAll();
