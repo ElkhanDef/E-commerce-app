@@ -162,6 +162,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProductListResponseDto> getAllProducts(PageableRequest request) {
         log.info("ActionLog.getAllProducts.start");
         Pageable pageable = request.toPageable();
@@ -195,6 +196,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductResponseDto getProductBySlug(String slug) {
         log.info("ActionLog.getProductBySlug.start");
         ProductEntity product = productRepository.findBySlug(slug)
@@ -204,6 +206,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void deleteProductById(Long id) {
         log.info("ActionLog.deleteProductById.start");
         ProductEntity product = productRepository.findById(id)
