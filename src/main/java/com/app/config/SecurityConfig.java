@@ -47,8 +47,9 @@ public class SecurityConfig {
                                         "/api/v1/auth/reset-password/verify",
                                         "/api/v1/auth/forgot-password").permitAll()
                                 //ADMIN
-                                .requestMatchers("/api/v1/categories/management/**").hasRole("ADMIN")
-                                .requestMatchers("/api/v1/products/management/**").hasRole("ADMIN")
+                                .requestMatchers(
+                                        "/api/v1/categories/management/**",
+                                        "/api/v1/products/management/**").hasRole("ADMIN")
                                 //PUBLIC
                                 .requestMatchers(HttpMethod.GET, "/api/v1/categories/**", "/api/v1/products/**").permitAll()
                                 //AUTHENTICATED
