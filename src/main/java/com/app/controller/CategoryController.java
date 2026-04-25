@@ -39,26 +39,26 @@ public class CategoryController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(path = "/id/{id}")
+    @GetMapping(path = "/management/{id}")
     public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
+    @PostMapping(path = "/management")
     public ResponseEntity<CategoryResponseDto> create(@RequestBody @Valid CategoryRequestDto request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(request));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
+    @PutMapping("/management/{id}")
     public ResponseEntity<CategoryResponseDto> update(@RequestBody @Valid CategoryRequestDto request,
                                                       @PathVariable(name = "id") Long categoryId) {
         return ResponseEntity.ok(categoryService.update(request, categoryId));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "/management/{id}")
     public ResponseEntity<Void> deleteCategoryById(@PathVariable Long id) {
         categoryService.deleteCategoryById(id);
         return ResponseEntity.noContent().build();
