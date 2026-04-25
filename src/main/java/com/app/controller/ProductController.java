@@ -47,33 +47,33 @@ public class ProductController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
+    @PostMapping(path = "/management")
     public ResponseEntity<ProductResponseDto> createProduct(@RequestBody @Valid ProductRequestDto productRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(productRequestDto));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(path = "/{productId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/management/{productId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PartialImageUploadResponseDto> uploadImages(@PathVariable Long productId,
                                                                       @RequestParam("files") List<MultipartFile> files) {
         return ResponseEntity.ok(productService.uploadImages(productId, files));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(path = "/id/{productId}")
+    @GetMapping(path = "/management/{productId}")
     public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long productId) {
         return ResponseEntity.ok(productService.getProductById(productId));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/{productId}/images/{imageId}/main")
+    @PatchMapping("/management/{productId}/images/{imageId}/main")
     public ResponseEntity<ProductResponseDto> selectMainImage(@PathVariable Long productId,
                                                               @PathVariable Long imageId) {
         return ResponseEntity.ok(productService.selectMainImage(productId, imageId));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "/management/{id}")
     public ResponseEntity<Void> deleteProductById(@PathVariable Long id) {
         productService.deleteProductById(id);
         return ResponseEntity.noContent().build();
