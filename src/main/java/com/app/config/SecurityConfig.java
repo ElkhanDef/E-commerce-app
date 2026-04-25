@@ -46,11 +46,12 @@ public class SecurityConfig {
                                         "/api/v1/auth/reset-password",
                                         "/api/v1/auth/reset-password/verify",
                                         "/api/v1/auth/forgot-password").permitAll()
-
-                                .requestMatchers(HttpMethod.GET, "/api/v1/products").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/products/*").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/categories").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/categories/*").permitAll()
+                                //ADMIN
+                                .requestMatchers("/api/v1/categories/management/**").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/products/management/**").hasRole("ADMIN")
+                                //PUBLIC
+                                .requestMatchers(HttpMethod.GET, "/api/v1/categories/**", "/api/v1/products/**").permitAll()
+                                //AUTHENTICATED
                                 .anyRequest().authenticated())
 
                 .sessionManagement(session -> session
