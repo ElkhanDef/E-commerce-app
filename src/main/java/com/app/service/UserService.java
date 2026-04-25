@@ -5,4 +5,5 @@ import com.app.model.dto.response.UserResponseDto;
 public interface UserService {
 
     UserResponseDto getCurrentUser();
+    UserResponseDto getUserById(Long id);
 }

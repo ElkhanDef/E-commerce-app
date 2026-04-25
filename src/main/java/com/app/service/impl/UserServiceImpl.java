@@ -2,6 +2,7 @@ package com.app.service.impl;
 
 import com.app.exception.ApplicationException;
 import com.app.exception.data.ErrorCode;
+import com.app.mapper.UserMapper;
 import com.app.model.dto.response.UserResponseDto;
 import com.app.model.entity.UserEntity;
 import com.app.repository.UserRepository;
@@ -35,14 +36,15 @@ public class UserServiceImpl implements UserService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
         log.info("ActionLog.getCurrentUser.end");
-        return UserResponseDto.builder()
-                .id(userId)
-                .name(user.getName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .phoneNumber(user.getPhoneNumber())
-                .isActive(user.isActive())
-                .isVerified(user.isVerified())
-                .build();
+        return UserMapper.INSTANCE.toDto(user);
+    }
+
+    @Override
+    public UserResponseDto getUserById(Long id) {
+        log.info("ActionLog.getUserById.start");
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
+        log.info("ActionLog.getUserById.end");
+        return UserMapper.INSTANCE.toDto(user);
     }
 }
