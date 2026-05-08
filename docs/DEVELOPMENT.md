@@ -30,6 +30,7 @@ e-commerce/
 - **Lombok**
 - **MinIO** (Development) / **AWS S3** (Production)
 - **Maven Wrapper (3.9.12)**
+- **Redis**
 
 ## Getting Started
 
@@ -146,3 +147,4 @@ docker-compose -f devops/docker-compose.yml logs -f
 - Database port: `5432`
 - MinIO API port: `9000`
 - MinIO Console port: `9001`
+- Redis port: `6379`
