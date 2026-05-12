@@ -11,10 +11,9 @@ public class ProductResponseDto {
     private Integer stock;
     private String sku;
     private String description;
-    private List<String> imageUrls;
-    private String mainImageUrl;
     private String slug;
     private CategoryResponseDto categoryResponse;
+    private List<ImageResponseDto> imagesResponse;
 
     public ProductResponseDto(Long id,
                               String name,
@@ -22,20 +21,18 @@ public class ProductResponseDto {
                               Integer stock,
                               String sku,
                               String description,
-                              List<String> imageUrls,
-                              String mainImageUrl,
                               String slug,
-                              CategoryResponseDto categoryResponse) {
+                              CategoryResponseDto categoryResponse,
+                              List<ImageResponseDto> imagesResponse) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.stock = stock;
         this.sku = sku;
         this.description = description;
-        this.imageUrls = imageUrls;
-        this.mainImageUrl = mainImageUrl;
         this.slug = slug;
         this.categoryResponse = categoryResponse;
+        this.imagesResponse = imagesResponse;
     }
 
     public Long getId() {return id;}
@@ -48,16 +45,14 @@ public class ProductResponseDto {
     public void setStock(Integer stock) {this.stock = stock;}
     public String getDescription() {return description;}
     public void setDescription(String description) {this.description = description;}
-    public List<String> getImageUrls() {return imageUrls;}
-    public void setImageUrls(List<String> imageUrls) {this.imageUrls = imageUrls;}
     public String getSku() {return sku;}
     public void setSku(String sku) {this.sku = sku;}
-    public String getMainImageUrl() {return mainImageUrl;}
-    public void setMainImageUrl(String mainImageUrl) {this.mainImageUrl = mainImageUrl;}
     public String getSlug() {return slug;}
     public void setSlug(String slug) {this.slug = slug;}
     public CategoryResponseDto getCategoryResponse() {return categoryResponse;}
     public void setCategoryResponse(CategoryResponseDto categoryResponse) {this.categoryResponse = categoryResponse;}
+    public List<ImageResponseDto> getImagesResponse() {return imagesResponse;}
+    public void setImagesResponse(List<ImageResponseDto> imagesResponse) {this.imagesResponse = imagesResponse;}
 
     public static Builder builder() {
         return new Builder();
@@ -71,10 +66,9 @@ public class ProductResponseDto {
         private Integer stock;
         private String sku;
         private String description;
-        private List<String> imageUrls;
-        private String mainImageUrl;
         private String slug;
         private CategoryResponseDto categoryResponse;
+        private List<ImageResponseDto> imagesResponse;
 
         public Builder id(Long id) {
             this.id = id;
@@ -106,16 +100,6 @@ public class ProductResponseDto {
             return this;
         }
 
-        public Builder imageUrls(List<String> imageUrls) {
-            this.imageUrls = imageUrls;
-            return this;
-        }
-
-        public Builder mainImageUrl(String mainImageUrl) {
-            this.mainImageUrl = mainImageUrl;
-            return this;
-        }
-
         public Builder slug(String slug) {
             this.slug = slug;
             return this;
@@ -123,6 +107,11 @@ public class ProductResponseDto {
 
         public Builder categoryResponse(CategoryResponseDto categoryResponse) {
             this.categoryResponse = categoryResponse;
+            return this;
+        }
+
+        public Builder imagesResponse(List<ImageResponseDto> imagesResponse) {
+            this.imagesResponse = imagesResponse;
             return this;
         }
 
@@ -134,10 +123,9 @@ public class ProductResponseDto {
                     stock,
                     sku,
                     description,
-                    imageUrls,
-                    mainImageUrl,
                     slug,
-                    categoryResponse
+                    categoryResponse,
+                    imagesResponse
             );
         }
     }
