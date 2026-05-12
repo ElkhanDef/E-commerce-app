@@ -29,10 +29,10 @@ public interface ProductMapper {
 
     @Mappings({
             @Mapping(target = "categoryResponse", ignore = true),
-            @Mapping(target = "imageUrls", ignore = true),
-            @Mapping(target = "mainImageUrl", ignore = true)
+            @Mapping(target = "imagesResponse" , ignore = true)
     })
     ProductResponseDto toDto(ProductEntity productEntity);
 
+    @Mapping(target = "mainImageUrl" , ignore = true)
     ProductListResponseDto toDtoList(ProductEntity productEntity);
 }

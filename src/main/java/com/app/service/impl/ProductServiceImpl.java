@@ -8,6 +8,7 @@ import com.app.mapper.ProductMapper;
 import com.app.model.dto.request.PageableRequest;
 import com.app.model.dto.request.ProductRequestDto;
 import com.app.model.dto.response.FailedImageDto;
+import com.app.model.dto.response.ImageResponseDto;
 import com.app.model.dto.response.PartialImageUploadResponseDto;
 import com.app.model.dto.response.ProductListResponseDto;
 import com.app.model.dto.response.ProductResponseDto;
@@ -100,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
 
             try {
                 imageValidator.validateImage(image);
-                String path = bucket + "/" + productId + "/" + uniqueFileName;
+                String path = productId + "/" + uniqueFileName;
 
                 minioClient.putObject(
                         PutObjectArgs.builder()
@@ -145,7 +146,7 @@ public class ProductServiceImpl implements ProductService {
             uploadedList.add(
                     UploadedImageDto.builder()
                             .id(entity.getId())
-                            .url(fileStorageProperties.endpoint() + "/" + entity.getImagePath())
+                            .url(fileStorageProperties.endpoint() + "/" + bucket + "/" + entity.getImagePath())
                             .fileName(entity.getFileName())
                             .main(entity.isMain())
                             .build()
@@ -166,8 +167,25 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductListResponseDto> getAllProducts(PageableRequest request) {
         log.info("ActionLog.getAllProducts.start");
         Pageable pageable = request.toPageable();
+
+        String baseUrl = fileStorageProperties.endpoint() + "/" + fileStorageProperties.bucket() + "/";
+
+        Page<ProductListResponseDto> result = productRepository.findAll(pageable)
+                .map(product -> {
+                    ProductListResponseDto dto = ProductMapper.INSTANCE.toDtoList(product);
+
+                    product.getImages().stream()
+                            .filter(ProductImageEntity::isMain)
+                            .findFirst()
+                            .ifPresent(img -> {
+                                dto.setMainImageUrl(baseUrl + img.getImagePath());
+                            });
+
+                    return dto;
+                });
+
         log.info("ActionLog.getAllProducts.end");
-        return productRepository.findAll(pageable).map(ProductMapper.INSTANCE::toDtoList);
+        return result;
     }
 
     @Override
@@ -210,31 +228,33 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProductById(Long id) {
         log.info("ActionLog.deleteProductById.start");
         ProductEntity product = productRepository.findById(id)
-                        .orElseThrow(() -> new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND));
         productRepository.delete(product);
         log.info("ActionLog.deleteProductById.end");
     }
 
     private ProductResponseDto buildProductResponse(ProductEntity product) {
         log.info("ProductResponseDto.buildProductResponse.start");
-        String baseUrl = fileStorageProperties.endpoint() + "/";
+        String baseUrl = fileStorageProperties.endpoint() + "/" + fileStorageProperties.bucket() + "/";
 
-        List<String> imageUrls = new ArrayList<>();
-        String mainImageUrl = null;
+        List<ProductImageEntity> productImages = product.getImages();
+        List<ImageResponseDto> imagesDtoList = new ArrayList<>();
 
-        for (ProductImageEntity image : product.getImages()) {
-            String fullUrl = baseUrl + image.getImagePath();
-            imageUrls.add(fullUrl);
-
-            if(image.isMain()) {
-                mainImageUrl = fullUrl;
-            }
+        for (ProductImageEntity entity : productImages) {
+            imagesDtoList.add(
+                    ImageResponseDto.builder()
+                            .id(entity.getId())
+                            .main(entity.isMain())
+                            .productId(product.getId())
+                            .createdAt(entity.getCreatedAt())
+                            .updatedAt(entity.getUpdatedAt())
+                            .url(baseUrl + entity.getImagePath())
+                            .build());
         }
 
         ProductResponseDto response = ProductMapper.INSTANCE.toDto(product);
         response.setCategoryResponse(CategoryMapper.INSTANCE.toDto(product.getCategory()));
-        response.setImageUrls(imageUrls);
-        response.setMainImageUrl(mainImageUrl);
+        response.setImagesResponse(imagesDtoList);
         log.info("ProductResponseDto.buildProductResponse.end");
         return response;
     }
