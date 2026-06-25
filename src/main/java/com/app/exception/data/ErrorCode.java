@@ -26,6 +26,7 @@ public enum ErrorCode {
 
     //PRODUCT
     IMAGE_UPLOAD_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "Resim yükleme başarısız oldu"),
+    MAIN_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND,"Ana görsel bulunamadı"),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "Ürün bulunamadı"),
     IMAGE_NOT_BELONG_TO_PRODUCT(HttpStatus.BAD_REQUEST, "Görsel belirtilen ürüne ait değil"),
 
@@ -38,6 +39,11 @@ public enum ErrorCode {
     TOO_MANY_IMAGES(HttpStatus.BAD_REQUEST, "Çok fazla görsel yüklenemez"),
     NO_IMAGES_PROVIDED(HttpStatus.BAD_REQUEST, "Hiç görsel sağlanmadı"),
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND,"Dosya bulunamadı"),
+
+    //CART
+    INVALID_QUANTITY(HttpStatus.BAD_REQUEST,"Miktar 0'dan büyük olmalıdır"),
+    CART_EMPTY(HttpStatus.NOT_FOUND,"Sepet boşdur"),
+    PRODUCT_NOT_FOUND_IN_CART(HttpStatus.NOT_FOUND,"Ürün sepette bulunamadı"),
 
 
     // GENERIC
