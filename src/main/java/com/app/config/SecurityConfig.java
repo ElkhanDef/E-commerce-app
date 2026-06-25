@@ -51,7 +51,7 @@ public class SecurityConfig {
                                         "/api/v1/categories/management/**",
                                         "/api/v1/products/management/**").hasRole("ADMIN")
                                 //PUBLIC
-                                .requestMatchers(HttpMethod.GET, "/api/v1/categories/**", "/api/v1/products/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/categories/**", "/api/v1/products/**" ,"/api/v1/users/**").permitAll()
                                 //AUTHENTICATED
                                 .anyRequest().authenticated())
 
