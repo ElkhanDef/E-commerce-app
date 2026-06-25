@@ -75,7 +75,7 @@ public class CartServiceImpl implements CartService {
         log.info("ActionLog.addToCart.end");
         return CartResponseDto.builder()
                 .cartItems(cartItems)
-                .message("Cart successfully updated")
+                .message("Product added to cart successfully")
                 .userId(userId)
                 .totalPrice(calculateTotalPrice(cartItems))
                 .totalQuantity(calculateTotalQuantity(cartItems))
@@ -96,7 +96,7 @@ public class CartServiceImpl implements CartService {
         log.info("ActionLog.removeFromCart.end");
         return CartResponseDto.builder()
                 .cartItems(cartItems)
-                .message("Cart successfully updated")
+                .message("Product removed from cart successfully")
                 .userId(userId)
                 .totalPrice(calculateTotalPrice(cartItems))
                 .totalQuantity(calculateTotalQuantity(cartItems))
