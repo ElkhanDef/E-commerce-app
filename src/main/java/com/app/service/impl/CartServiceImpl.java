@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Service
@@ -44,34 +45,48 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDto addToCart(Long userId, Long productId, int quantity) {
         log.info("ActionLog.addToCart.start");
-        List<CartItemDto> cartItems = cartCache.get(userId, k -> new ArrayList<>());
+        List<CartItemDto> currentCart = cartCache.getIfPresent(userId);
+        boolean alreadyInCart = currentCart != null && currentCart.stream()
+                .anyMatch(i -> i.getProductId().equals(productId));
 
-        Optional<CartItemDto> existingItem = cartItems.stream()
-                .filter(item -> item.getProductId().equals(productId))
-                .findFirst();
-
-        if (existingItem.isPresent()) {
-            CartItemDto item = existingItem.get();
-            item.setQuantity(item.getQuantity() + quantity);
-        } else {
-
+        CartItemDto newItem = null;
+        if (!alreadyInCart) {
             ProductEntity product = productRepository.findById(productId)
                     .orElseThrow(() -> new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND));
 
             String mainImagePath = productImageRepository.findMainImagePath(productId)
-                    .orElseThrow(() -> new ApplicationException(ErrorCode.MAIN_IMAGE_NOT_FOUND));
+                    .orElse(null);
 
-            String baseUrl = fileStorageProperties.endpoint() + "/" + fileStorageProperties.bucket() + "/";
-            String fullUrl = baseUrl + mainImagePath;
+            String fullUrl = (mainImagePath == null) ? null :
+                    fileStorageProperties.endpoint() + "/" +
+                            fileStorageProperties.bucket() + "/" + mainImagePath;
 
-            cartItems.add(CartItemDto.builder()
+            newItem = CartItemDto.builder()
                     .productId(productId)
                     .quantity(quantity)
                     .productName(product.getName())
                     .mainImageUrl(fullUrl)
                     .unitPrice(product.getPrice())
-                    .build());
+                    .build();
         }
+
+        final CartItemDto itemToAdd = newItem;
+
+        List<CartItemDto> cartItems = cartCache.asMap().compute(userId, (key, items) -> {
+            List<CartItemDto> list = (items == null) ? new ArrayList<>() : items;
+
+            Optional<CartItemDto> existing = list.stream()
+                    .filter(i -> i.getProductId().equals(productId))
+                    .findFirst();
+
+            if (existing.isPresent()) {
+                existing.get().setQuantity(existing.get().getQuantity() + quantity);
+            } else if (itemToAdd != null) {
+                list.add(itemToAdd);
+            }
+            return list;
+        });
+
         log.info("ActionLog.addToCart.end");
         return CartResponseDto.builder()
                 .cartItems(cartItems)
@@ -85,12 +100,16 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDto removeFromCart(Long userId, Long productId) {
         log.info("ActionLog.removeFromCart.start");
-        List<CartItemDto> cartItems = cartCache.getIfPresent(userId);
+        AtomicBoolean removed = new AtomicBoolean(false);
+
+        List<CartItemDto> cartItems = cartCache.asMap().computeIfPresent(userId, (key,items) -> {
+            removed.set(items.removeIf(item -> item.getProductId().equals(productId)));
+            return items;
+        });
         if (cartItems == null) {
             throw new ApplicationException(ErrorCode.CART_EMPTY);
         }
-        boolean removed = cartItems.removeIf(item -> productId.equals(item.getProductId()));
-        if (!removed) {
+        if (!removed.get()) {
             throw new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND_IN_CART);
         }
         log.info("ActionLog.removeFromCart.end");
@@ -108,35 +127,50 @@ public class CartServiceImpl implements CartService {
         log.info("ActionLog.getCart.start");
         List<CartItemDto> cartItems = cartCache.getIfPresent(userId);
         if (cartItems == null) {
-            throw new ApplicationException(ErrorCode.CART_EMPTY);
+            cartItems = new ArrayList<>();
         }
+
+        List<CartItemDto> snapshot;
+        synchronized (cartItems) {
+            snapshot = new ArrayList<>(cartItems);
+        }
+
         log.info("ActionLog.getCart.end");
         return CartResponseDto.builder()
-                .cartItems(cartItems)
+                .cartItems(snapshot)
                 .message("Cart retrieved successfully")
                 .userId(userId)
-                .totalPrice(calculateTotalPrice(cartItems))
-                .totalQuantity(calculateTotalQuantity(cartItems))
+                .totalPrice(calculateTotalPrice(snapshot))
+                .totalQuantity(calculateTotalQuantity(snapshot))
                 .build();
     }
 
     @Override
     public CartResponseDto updateCart(Long userId, Long productId, int quantity) {
         log.info("ActionLog.updateCart.start");
-        List<CartItemDto> cartItems = cartCache.getIfPresent(userId);
+
+        AtomicBoolean found = new AtomicBoolean(false);
+
+        List<CartItemDto> cartItems = cartCache.asMap().computeIfPresent(userId, (key, items) -> {
+
+            items.stream()
+                    .filter(i -> i.getProductId().equals(productId))
+                    .findFirst()
+                    .ifPresent(item -> {
+                        found.set(true);
+                        item.setQuantity(quantity);
+                    });
+
+            return items;
+        });
+
         if (cartItems == null) {
             throw new ApplicationException(ErrorCode.CART_EMPTY);
         }
-        CartItemDto item = cartItems.stream()
-                .filter(i -> i.getProductId().equals(productId))
-                .findFirst()
-                .orElseThrow(() -> new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND_IN_CART));
-
-        if (quantity <= 0) {
-            cartItems.remove(item);
-        } else {
-            item.setQuantity(quantity);
+        if (!found.get()) {
+            throw new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND_IN_CART);
         }
+
         log.info("ActionLog.updateCart.end");
         return CartResponseDto.builder()
                 .cartItems(cartItems)
@@ -150,10 +184,6 @@ public class CartServiceImpl implements CartService {
     @Override
     public void clearCart(Long userId) {
         log.info("ActionLog.clearCart.start");
-        List<CartItemDto> cartItems = cartCache.getIfPresent(userId);
-        if (cartItems == null) {
-            throw new ApplicationException(ErrorCode.CART_EMPTY);
-        }
         cartCache.invalidate(userId);
         log.info("ActionLog.clearCart.end");
     }
@@ -161,6 +191,7 @@ public class CartServiceImpl implements CartService {
     private int calculateTotalQuantity(List<CartItemDto> cartItems) {
         return cartItems.stream().mapToInt(CartItemDto::getQuantity).sum();
     }
+
     private BigDecimal calculateTotalPrice(List<CartItemDto> cartItems) {
         return cartItems.stream().map(CartItemDto::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
