@@ -57,9 +57,9 @@ public class CartServiceImpl implements CartService {
             String mainImagePath = productImageRepository.findMainImagePath(productId)
                     .orElse(null);
 
-            String fullUrl = (mainImagePath == null) ? null
-                    : fileStorageProperties.endpoint() + "/"
-                    + fileStorageProperties.bucket() + "/" + mainImagePath;
+            String fullUrl = (mainImagePath == null) ? null :
+                    fileStorageProperties.endpoint() + "/" +
+                            fileStorageProperties.bucket() + "/" + mainImagePath;
 
             newItem = CartItemDto.builder()
                     .productId(productId)
