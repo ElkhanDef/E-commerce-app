@@ -23,15 +23,20 @@ import com.app.repository.ProductRepository;
 import com.app.service.ProductService;
 import com.app.utils.CommonUtils;
 import com.app.validator.ImageFileValidator;
+import io.minio.GetObjectArgs;
+import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,7 +106,7 @@ public class ProductServiceImpl implements ProductService {
 
             try {
                 imageValidator.validateImage(image);
-                String path = productId + "/" + uniqueFileName;
+                String path = productId + "/original/" + uniqueFileName;
 
                 minioClient.putObject(
                         PutObjectArgs.builder()
@@ -115,7 +120,8 @@ public class ProductServiceImpl implements ProductService {
                         path,
                         false,
                         uniqueFileName,
-                        product
+                        product,
+                        null
                 );
                 productImages.add(entity);
 
@@ -140,7 +146,6 @@ public class ProductServiceImpl implements ProductService {
             } //CHECKSTYLE:ON
         }
         productImageRepository.saveAll(productImages);
-        //product.getImages().addAll(productImages);
 
         for (ProductImageEntity entity : productImages) {
             uploadedList.add(
@@ -208,7 +213,57 @@ public class ProductServiceImpl implements ProductService {
         if (changedRow == 0) {
             throw new ApplicationException(ErrorCode.IMAGE_NOT_BELONG_TO_PRODUCT);
         }
-        ProductEntity product = productRepository.findById(productId).get();
+
+        ProductImageEntity newMainImage = productImageRepository.findById(imageId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.FILE_NOT_FOUND));
+
+        String mainImagePath = newMainImage.getImagePath();
+        String uniqueFileName = newMainImage.getFileName();
+        String thumbPath = productId + "/thumbnails/thumb_" + uniqueFileName;
+
+        if (newMainImage.getThumbPath() == null) {
+            try {
+                ByteArrayOutputStream thumbStream = new ByteArrayOutputStream();
+
+                GetObjectResponse response = minioClient.getObject(
+                        GetObjectArgs.builder()
+                                .bucket("products")
+                                .object(mainImagePath)
+                                .build()
+                );
+
+                Thumbnails.of(response)
+                        .size(300, 300)
+                        .outputFormat("jpg")
+                        .toOutputStream(thumbStream);
+
+                byte[] thumbBytes = thumbStream.toByteArray();
+
+                String contentType = response.headers().get("Content-Type");
+
+                minioClient.putObject(
+                        PutObjectArgs.builder()
+                                .bucket("products")
+                                .object(thumbPath)
+                                .stream(new ByteArrayInputStream(thumbBytes), thumbBytes.length, -1)
+                                .contentType(contentType)
+                                .build()
+                );
+
+                newMainImage.setThumbPath(thumbPath);
+                productImageRepository.save(newMainImage);
+
+                log.info("ActionLog.selectMainImage.Thumbnail created: {}", thumbPath);
+            //CHECKSTYLE:OFF
+            } catch (Exception ex) {
+                log.error("ActionLog.selectMainImage.Failed to create thumbnail for image: {}", mainImagePath, ex);
+            }
+            //CHECKSTYLE:ON
+        }
+
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND));
+
         log.info("ActionLog.selectMainImage.end");
         return buildProductResponse(product);
     }
@@ -245,6 +300,7 @@ public class ProductServiceImpl implements ProductService {
                     ImageResponseDto.builder()
                             .id(entity.getId())
                             .main(entity.isMain())
+                            .thumbnailPath(entity.getThumbPath())
                             .productId(product.getId())
                             .createdAt(entity.getCreatedAt())
                             .updatedAt(entity.getUpdatedAt())

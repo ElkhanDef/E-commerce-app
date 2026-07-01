@@ -30,15 +30,18 @@ public class ProductImageEntity extends BaseAuditEntity {
     @Column(name = "is_main")
     private boolean isMain;
 
+    private String thumbPath;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity product;
 
-    public ProductImageEntity(String imagePath, boolean isMain, String fileName, ProductEntity product) {
+    public ProductImageEntity(String imagePath, boolean isMain, String fileName, ProductEntity product, String thumbPath) {
         this.imagePath = imagePath;
         this.isMain = isMain;
         this.fileName = fileName;
         this.product = product;
+        this.thumbPath = thumbPath;
     }
 
     public ProductImageEntity() {}
@@ -65,6 +68,14 @@ public class ProductImageEntity extends BaseAuditEntity {
 
     public String getImagePath() {
         return imagePath;
+    }
+
+    public String getThumbPath() {
+        return thumbPath;
+    }
+
+    public void setThumbPath(String thumbPath) {
+        this.thumbPath = thumbPath;
     }
 
     public void setImagePath(String imagePath) {
