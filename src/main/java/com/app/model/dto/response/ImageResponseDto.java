@@ -8,16 +8,19 @@ public class ImageResponseDto {
     private Long productId;
     private String url;
     private boolean main;
+    private String thumbnailPath;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public ImageResponseDto(Long id, Long productId,
                             String url, boolean main,
+                            String thumbnailPath,
                             LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.productId = productId;
         this.url = url;
         this.main = main;
+        this.thumbnailPath = thumbnailPath;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -34,6 +37,7 @@ public class ImageResponseDto {
         private Long productId;
         private String url;
         private boolean main;
+        private String thumbnailPath;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
@@ -53,6 +57,10 @@ public class ImageResponseDto {
             this.main = main;
             return this;
         }
+        public Builder thumbnailPath(String thumbnailPath) {
+            this.thumbnailPath = thumbnailPath;
+            return this;
+        }
         public Builder createdAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
@@ -62,7 +70,7 @@ public class ImageResponseDto {
             return this;
         }
         public ImageResponseDto build() {
-            return new ImageResponseDto(id, productId, url, main, createdAt, updatedAt);
+            return new ImageResponseDto(id, productId, url, main,thumbnailPath, createdAt, updatedAt);
         }
     }
 
@@ -96,6 +104,14 @@ public class ImageResponseDto {
 
     public void setMain(boolean main) {
         this.main = main;
+    }
+
+    public String getThumbnailPath() {
+        return thumbnailPath;
+    }
+
+    public void setThumbnailPath(String thumbnailPath) {
+        this.thumbnailPath = thumbnailPath;
     }
 
     public LocalDateTime getCreatedAt() {
