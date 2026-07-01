@@ -227,7 +227,7 @@ public class ProductServiceImpl implements ProductService {
 
                 GetObjectResponse response = minioClient.getObject(
                         GetObjectArgs.builder()
-                                .bucket("products")
+                                .bucket(fileStorageProperties.bucket())
                                 .object(mainImagePath)
                                 .build()
                 );
@@ -243,7 +243,7 @@ public class ProductServiceImpl implements ProductService {
 
                 minioClient.putObject(
                         PutObjectArgs.builder()
-                                .bucket("products")
+                                .bucket(fileStorageProperties.bucket())
                                 .object(thumbPath)
                                 .stream(new ByteArrayInputStream(thumbBytes), thumbBytes.length, -1)
                                 .contentType(contentType)
