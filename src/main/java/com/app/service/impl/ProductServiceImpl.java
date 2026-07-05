@@ -257,6 +257,7 @@ public class ProductServiceImpl implements ProductService {
             //CHECKSTYLE:OFF
             } catch (Exception ex) {
                 log.error("ActionLog.selectMainImage.Failed to create thumbnail for image: {}", mainImagePath, ex);
+                throw new ApplicationException(ErrorCode.THUMBNAIL_CREATION_FAILED);
             }
             //CHECKSTYLE:ON
         }

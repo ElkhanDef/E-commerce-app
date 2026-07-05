@@ -22,4 +22,7 @@ public interface ProductImageRepository extends JpaRepository<ProductImageEntity
 
     @Query("SELECT p.imagePath FROM ProductImageEntity p WHERE p.isMain = true AND p.product.id = :productId")
     Optional<String> findMainImagePath(@Param("productId") Long productId);
+
+    @Query("SELECT p.thumbPath FROM ProductImageEntity p WHERE p.product.id = :productId AND p.isMain = true")
+    Optional<String> findMainImageThumbnailPath(@Param("productId") Long productId);
 }
