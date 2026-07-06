@@ -115,9 +115,7 @@ public class FavoriteServiceImpl implements FavoriteService {
                             .map(ProductImageEntity::getThumbPath)
                             .orElse(null);
 
-                    String imageUrl = thumbPath != null
-                            ? baseUrl + thumbPath
-                            : null;
+                    String imageUrl = thumbPath != null ? baseUrl + thumbPath : null;
 
                     return FavoriteProductDto.builder()
                             .id(product.getId())
