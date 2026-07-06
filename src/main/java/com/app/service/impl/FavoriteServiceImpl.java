@@ -7,6 +7,7 @@ import com.app.model.dto.response.FavoriteProductDto;
 import com.app.model.dto.response.FavoriteResponseDto;
 import com.app.model.entity.FavoriteEntity;
 import com.app.model.entity.ProductEntity;
+import com.app.model.entity.ProductImageEntity;
 import com.app.model.entity.UserEntity;
 import com.app.repository.FavoriteRepository;
 import com.app.repository.ProductImageRepository;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -93,5 +95,40 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .product(dto)
                 .message(message)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<FavoriteProductDto> getFavorites(Long userId) {
+        log.info("ActionLog.getFavorites.start");
+        List<FavoriteEntity> favorites = favoriteRepository.findByUserId(userId);
+
+        String baseUrl = fileStorageProperties.endpoint() + "/" +
+                fileStorageProperties.bucket() + "/";
+
+        List<FavoriteProductDto> result = favorites.stream()
+                .map(fav -> {
+                    ProductEntity product = fav.getProduct();
+
+                    String thumbPath = product.getImages().stream()
+                            .filter(ProductImageEntity::isMain)
+                            .findFirst()
+                            .map(ProductImageEntity::getThumbPath)
+                            .orElse(null);
+
+                    String imageUrl = thumbPath != null
+                            ? baseUrl + thumbPath
+                            : null;
+
+                    return FavoriteProductDto.builder()
+                            .id(product.getId())
+                            .name(product.getName())
+                            .price(product.getPrice())
+                            .mainImageUrl(imageUrl)
+                            .build();
+                })
+                .toList();
+
+        log.info("ActionLog.getFavorites.end");
+        return result;
     }
 }
