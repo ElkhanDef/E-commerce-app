@@ -38,6 +38,7 @@ public enum ErrorCode {
     INVALID_FILE_EXTENSION(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Dosya uzantısı desteklenmiyor"),
     TOO_MANY_IMAGES(HttpStatus.BAD_REQUEST, "Çok fazla görsel yüklenemez"),
     NO_IMAGES_PROVIDED(HttpStatus.BAD_REQUEST, "Hiç görsel sağlanmadı"),
+    THUMBNAIL_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Görsel işlenirken bir hata oluştu"),
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND,"Dosya bulunamadı"),
 
     //CART

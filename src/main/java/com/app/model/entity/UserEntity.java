@@ -10,9 +10,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+
+import java.util.Set;
 
 @Entity
 @Table(name = UserEntity.TABLE_NAME)
@@ -53,13 +56,20 @@ public class UserEntity extends BaseAuditEntity {
     @Column(name = "role")
     private UserRole role;
 
-    public UserEntity(AddressEntity address, String email, String lastName, String name, String password, String phoneNumber) {
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    private Set<FavoriteEntity> favorites;
+
+    public UserEntity(AddressEntity address, String email,
+                      String lastName, String name,
+                      String password, String phoneNumber,
+                      Set<FavoriteEntity> favorites) {
         this.address = address;
         this.email = email;
         this.lastName = lastName;
         this.name = name;
         this.password = password;
         this.phoneNumber = phoneNumber;
+        this.favorites = favorites;
     }
 
     public UserEntity() {}
