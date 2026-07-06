@@ -1,13 +1,17 @@
 package com.app.controller;
 
+import com.app.model.dto.response.FavoriteProductDto;
 import com.app.model.dto.response.FavoriteResponseDto;
 import com.app.service.FavoriteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/favorites")
@@ -23,5 +27,10 @@ public class FavoriteController {
     public ResponseEntity<FavoriteResponseDto> toggleFavorite (@PathVariable Long productId,
                                                                @AuthenticationPrincipal String userId){
         return ResponseEntity.ok(favoriteService.toggleFavorite(productId, Long.valueOf(userId)));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<FavoriteProductDto>>  getFavorites (@AuthenticationPrincipal String userId){
+        return ResponseEntity.ok(favoriteService.getFavorites(Long.valueOf(userId)));
     }
 }
