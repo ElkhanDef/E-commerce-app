@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 
 public class ProductListResponseDto {
 
-    private String id;
+    private Long id;
     private String name;
     private BigDecimal price;
     private String slug;
     private String mainImageUrl;
 
-    public ProductListResponseDto(String id, String slug,
+    public ProductListResponseDto(Long id, String slug,
                                   BigDecimal price, String name,
                                   String mainImageUrl) {
         this.id = id;
@@ -22,11 +22,11 @@ public class ProductListResponseDto {
 
     public ProductListResponseDto() {}
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -69,13 +69,13 @@ public class ProductListResponseDto {
     @SuppressWarnings("checkstyle:HiddenField")
     public static class Builder {
 
-        private String id;
+        private Long id;
         private String name;
         private BigDecimal price;
         private String slug;
         private String mainImageUrl;
 
-        public Builder id(String id) {
+        public Builder id(Long id) {
             this.id = id;
             return this;
         }
