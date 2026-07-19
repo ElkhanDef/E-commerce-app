@@ -8,14 +8,16 @@ public class FavoriteProductDto {
     private String name;
     private BigDecimal price;
     private String mainImageUrl;
+    private String slug;
 
     public FavoriteProductDto() {}
 
-    public FavoriteProductDto(Long id, String name, BigDecimal price, String mainImageUrl) {
+    public FavoriteProductDto(Long id, String name, BigDecimal price, String mainImageUrl,String slug) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.mainImageUrl = mainImageUrl;
+        this.slug = slug;
     }
 
     public static Builder builder() {
@@ -28,6 +30,7 @@ public class FavoriteProductDto {
         private String name;
         private BigDecimal price;
         private String mainImageUrl;
+        private String slug;
 
         public Builder id(Long id) {
             this.id = id;
@@ -45,8 +48,13 @@ public class FavoriteProductDto {
             this.mainImageUrl = mainImageUrl;
             return this;
         }
+        public Builder slug(String slug) {
+            this.slug = slug;
+            return this;
+        }
+
         public FavoriteProductDto build() {
-            return new FavoriteProductDto(id, name, price, mainImageUrl);
+            return new FavoriteProductDto(id, name, price, mainImageUrl, slug);
         }
     }
 
@@ -58,4 +66,6 @@ public class FavoriteProductDto {
     public void setPrice(BigDecimal price) { this.price = price; }
     public String getMainImageUrl() { return mainImageUrl; }
     public void setMainImageUrl(String mainImageUrl) { this.mainImageUrl = mainImageUrl; }
+    public String getSlug() { return slug; }
+    public void setSlug(String slug) { this.slug = slug; }
 }

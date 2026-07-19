@@ -122,6 +122,7 @@ public class FavoriteServiceImpl implements FavoriteService {
                             .name(product.getName())
                             .price(product.getPrice())
                             .mainImageUrl(imageUrl)
+                            .slug(product.getSlug())
                             .build();
                 })
                 .toList();
