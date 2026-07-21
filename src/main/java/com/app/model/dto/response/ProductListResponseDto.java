@@ -9,15 +9,17 @@ public class ProductListResponseDto {
     private BigDecimal price;
     private String slug;
     private String mainImageUrl;
+    private String categorySlug;
 
     public ProductListResponseDto(Long id, String slug,
                                   BigDecimal price, String name,
-                                  String mainImageUrl) {
+                                  String mainImageUrl,String categorySlug) {
         this.id = id;
         this.slug = slug;
         this.price = price;
         this.name = name;
         this.mainImageUrl = mainImageUrl;
+        this.categorySlug = categorySlug;
     }
 
     public ProductListResponseDto() {}
@@ -62,6 +64,13 @@ public class ProductListResponseDto {
         this.mainImageUrl = mainImageUrl;
     }
 
+    public String getCategorySlug() {
+        return categorySlug;
+    }
+    public void setCategorySlug(String categorySlug) {
+        this.categorySlug = categorySlug;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -74,6 +83,7 @@ public class ProductListResponseDto {
         private BigDecimal price;
         private String slug;
         private String mainImageUrl;
+        private String categorySlug;
 
         public Builder id(Long id) {
             this.id = id;
@@ -95,9 +105,13 @@ public class ProductListResponseDto {
             this.mainImageUrl = mainImageUrl;
             return this;
         }
+        public Builder categorySlug(String categorySlug) {
+            this.categorySlug = categorySlug;
+            return this;
+        }
 
         public ProductListResponseDto build() {
-            return new ProductListResponseDto(id, slug, price, name, mainImageUrl);
+            return new ProductListResponseDto(id, slug, price, name, mainImageUrl, categorySlug);
         }
     }
 }
