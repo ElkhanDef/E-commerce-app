@@ -34,5 +34,6 @@ public interface ProductMapper {
     ProductResponseDto toDto(ProductEntity productEntity);
 
     @Mapping(target = "mainImageUrl" , ignore = true)
+    @Mapping(source = "category.slug", target = "categorySlug")
     ProductListResponseDto toDtoList(ProductEntity productEntity);
 }

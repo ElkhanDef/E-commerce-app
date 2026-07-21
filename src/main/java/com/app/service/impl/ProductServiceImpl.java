@@ -175,7 +175,11 @@ public class ProductServiceImpl implements ProductService {
 
         String baseUrl = fileStorageProperties.endpoint() + "/" + fileStorageProperties.bucket() + "/";
 
-        Page<ProductListResponseDto> result = productRepository.findAll(pageable)
+        Page<ProductEntity> products = request.hasCategoryFilter() ?
+                productRepository.findAllByCategory_Slug(request.getCategorySlug(), pageable) :
+                productRepository.findAll(pageable);
+
+        Page<ProductListResponseDto> result = products
                 .map(product -> {
                     ProductListResponseDto dto = ProductMapper.INSTANCE.toDtoList(product);
 
@@ -297,11 +301,12 @@ public class ProductServiceImpl implements ProductService {
         List<ImageResponseDto> imagesDtoList = new ArrayList<>();
 
         for (ProductImageEntity entity : productImages) {
+            String fullThumbUrl = entity.getThumbPath() == null ? null : baseUrl + entity.getThumbPath();
             imagesDtoList.add(
                     ImageResponseDto.builder()
                             .id(entity.getId())
                             .main(entity.isMain())
-                            .thumbnailPath(entity.getThumbPath())
+                            .thumbnailPath(fullThumbUrl)
                             .productId(product.getId())
                             .createdAt(entity.getCreatedAt())
                             .updatedAt(entity.getUpdatedAt())
