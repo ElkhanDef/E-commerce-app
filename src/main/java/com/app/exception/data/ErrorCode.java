@@ -46,6 +46,9 @@ public enum ErrorCode {
     CART_EMPTY(HttpStatus.NOT_FOUND,"Sepet boşdur"),
     PRODUCT_NOT_FOUND_IN_CART(HttpStatus.NOT_FOUND,"Ürün sepette bulunamadı"),
 
+    //ADDRESS
+    ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND,"Adres bilgisi bulunamadı"),
+
 
     // GENERIC
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Sunucu hatası");

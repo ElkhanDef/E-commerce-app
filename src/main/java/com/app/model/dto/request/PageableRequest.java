@@ -21,6 +21,12 @@ public class PageableRequest {
 
     private boolean asc = false;
 
+    private String categorySlug;
+
+    public boolean hasCategoryFilter() {
+        return categorySlug != null && !categorySlug.isBlank();
+    }
+
     public Pageable toPageable() {
         Sort sort = asc ? Sort.by(column).ascending() : Sort.by(column).descending();
         return PageRequest.of(pageNumber, pageSize, sort);
@@ -56,5 +62,13 @@ public class PageableRequest {
 
     public void setAsc(boolean asc) {
         this.asc = asc;
+    }
+
+    public String getCategorySlug() {
+        return categorySlug;
+    }
+
+    public void setCategorySlug(String categorySlug) {
+        this.categorySlug = categorySlug;
     }
 }

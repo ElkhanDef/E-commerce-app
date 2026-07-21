@@ -17,6 +17,9 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     Optional<ProductEntity> findBySlug(String slug);
 
     @Override
-    @EntityGraph(attributePaths = {"images"})
+    @EntityGraph(attributePaths = {"images","category"})
     Page<ProductEntity> findAll(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"images","category"})
+    Page<ProductEntity> findAllByCategory_Slug(String categorySlug, Pageable pageable);
 }
