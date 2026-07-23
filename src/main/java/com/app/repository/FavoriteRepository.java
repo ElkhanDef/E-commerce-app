@@ -2,6 +2,7 @@ package com.app.repository;
 
 import com.app.model.entity.FavoriteEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,8 @@ public interface FavoriteRepository extends JpaRepository<FavoriteEntity, Long> 
 
     @Query("SELECT f FROM FavoriteEntity f JOIN FETCH f.product WHERE f.user.id = :userId")
     List<FavoriteEntity> findByUserId(@Param("userId") Long userId);
+
+    @Modifying
+    @Query("DELETE FROM FavoriteEntity f WHERE f.product.id = :productId")
+    void deleteByProductId(@Param("productId") Long productId);
 }
