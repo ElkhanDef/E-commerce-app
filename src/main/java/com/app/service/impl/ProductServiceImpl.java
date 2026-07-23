@@ -105,12 +105,13 @@ public class ProductServiceImpl implements ProductService {
 
         String bucket = fileStorageProperties.bucket();
 
+        imageValidator.validateImageFiles(images);
+
         for (MultipartFile image : images) {
             String fileName = image.getOriginalFilename();
             String uniqueFileName = CommonUtils.generateUniqueImageName(fileName);
 
             try {
-                imageValidator.validateImage(image);
                 String path = productId + "/original/" + uniqueFileName;
 
                 minioClient.putObject(
