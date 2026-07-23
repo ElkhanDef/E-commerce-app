@@ -10,6 +10,7 @@ public class SignInResponseDto {
     private String accessToken;
     private String refreshToken;
     private Long expiresIn;
+    private String role;
 
     public SignInResponseDto(Long id,
                              String name,
@@ -18,7 +19,8 @@ public class SignInResponseDto {
                              String phoneNumber,
                              String accessToken,
                              String refreshToken,
-                             Long expiresIn) {
+                             Long expiresIn,
+                             String role) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
@@ -27,6 +29,7 @@ public class SignInResponseDto {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.expiresIn = expiresIn;
+        this.role = role;
     }
 
     public static Builder builder() {
@@ -44,6 +47,7 @@ public class SignInResponseDto {
         private String accessToken;
         private String refreshToken;
         private Long expiresIn;
+        private String role;
 
         public Builder id(Long id) {
             this.id = id;
@@ -85,6 +89,11 @@ public class SignInResponseDto {
             return this;
         }
 
+        public Builder role(String role) {
+            this.role = role;
+            return this;
+        }
+
         public SignInResponseDto build() {
             return new SignInResponseDto(
                     this.id,
@@ -94,7 +103,8 @@ public class SignInResponseDto {
                     this.phoneNumber,
                     this.accessToken,
                     this.refreshToken,
-                    this.expiresIn);
+                    this.expiresIn,
+                    this.role);
         }
     }
 
@@ -160,5 +170,12 @@ public class SignInResponseDto {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public String getRole() {
+        return role;
+    }
+    public void setRole(String role) {
+        this.role = role;
     }
 }

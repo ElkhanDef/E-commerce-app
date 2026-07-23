@@ -7,17 +7,20 @@ public class SignUpResponseDto {
     private String lastName;
     private String email;
     private String phoneNumber;
+    private String role;
 
     public SignUpResponseDto(Long id,
                              String name,
                              String phoneNumber,
                              String email,
-                             String lastName) {
+                             String lastName,
+                             String role) {
         this.id = id;
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.lastName = lastName;
+        this.role = role;
     }
 
     public static Builder builder() {
@@ -31,6 +34,7 @@ public class SignUpResponseDto {
         private String lastName;
         private String phoneNumber;
         private String email;
+        private String role;
 
         public Builder id(Long id) {
             this.id = id;
@@ -57,8 +61,13 @@ public class SignUpResponseDto {
             return this;
         }
 
+        public Builder role(String role) {
+            this.role = role;
+            return this;
+        }
+
         public SignUpResponseDto build() {
-            return new SignUpResponseDto(this.id, this.name, this.phoneNumber, this.email, this.lastName);
+            return new SignUpResponseDto(this.id, this.name, this.phoneNumber, this.email, this.lastName, this.role);
         }
 
     }
@@ -101,5 +110,12 @@ public class SignUpResponseDto {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getRole() {
+        return role;
+    }
+    public void setRole(String role) {
+        this.role = role;
     }
 }
