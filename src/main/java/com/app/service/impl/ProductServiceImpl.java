@@ -18,6 +18,7 @@ import com.app.model.entity.ProductEntity;
 import com.app.model.entity.ProductImageEntity;
 import com.app.model.enums.SlugTarget;
 import com.app.repository.CategoryRepository;
+import com.app.repository.FavoriteRepository;
 import com.app.repository.ProductImageRepository;
 import com.app.repository.ProductRepository;
 import com.app.service.ProductService;
@@ -27,6 +28,7 @@ import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.data.domain.Page;
@@ -51,6 +53,7 @@ public class ProductServiceImpl implements ProductService {
     private final ImageFileValidator imageValidator;
     private final ProductImageRepository productImageRepository;
     private final FileStorageProperties fileStorageProperties;
+    private final FavoriteRepository favoriteRepository;
 
     public ProductServiceImpl(ProductRepository productRepository,
                               MinioClient minioClient,
@@ -58,7 +61,8 @@ public class ProductServiceImpl implements ProductService {
                               SlugGeneratorService slugGenerator,
                               ImageFileValidator imageValidator,
                               ProductImageRepository productImageRepository,
-                              FileStorageProperties fileStorageProperties) {
+                              FileStorageProperties fileStorageProperties,
+                              FavoriteRepository favoriteRepository) {
         this.productRepository = productRepository;
         this.minioClient = minioClient;
         this.categoryRepository = categoryRepository;
@@ -66,6 +70,7 @@ public class ProductServiceImpl implements ProductService {
         this.imageValidator = imageValidator;
         this.productImageRepository = productImageRepository;
         this.fileStorageProperties = fileStorageProperties;
+        this.favoriteRepository = favoriteRepository;
     }
 
     @Override
@@ -289,9 +294,34 @@ public class ProductServiceImpl implements ProductService {
         log.info("ActionLog.deleteProductById.start");
         ProductEntity product = productRepository.findById(id)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        String bucket = fileStorageProperties.bucket();
+        for (ProductImageEntity image : product.getImages()) {
+            removeImageFromStorage(bucket, image.getImagePath());
+            if (image.getThumbPath() != null) {
+                removeImageFromStorage(bucket, image.getThumbPath());
+            }
+        }
+
+        favoriteRepository.deleteByProductId(id);
         productRepository.delete(product);
         log.info("ActionLog.deleteProductById.end");
     }
+
+    //CHECKSTYLE:OFF
+    private void removeImageFromStorage(String bucket, String objectPath) {
+        try {
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(objectPath)
+                            .build()
+            );
+        } catch (Exception ex) {
+            log.error("ActionLog.deleteProductById.Failed to delete image from storage: {}", objectPath, ex);
+        }
+    }
+    //CHECKSTYLE:ON
 
     private ProductResponseDto buildProductResponse(ProductEntity product) {
         log.info("ProductResponseDto.buildProductResponse.start");

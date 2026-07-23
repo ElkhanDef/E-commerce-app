@@ -107,6 +107,7 @@ public class AuthServiceImpl implements AuthService {
                 .lastName(savedUser.getLastName())
                 .email(savedUser.getEmail())
                 .phoneNumber(savedUser.getPhoneNumber())
+                .role(savedUser.getRole().toString())
                 .build();
     }
 
@@ -172,6 +173,7 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshTokenData.token())
                 .expiresIn(CommonUtils.calcTokenExpiration(jwtProperties.accessTokenExpiration()))
+                .role(user.getRole().toString())
                 .build();
     }
 

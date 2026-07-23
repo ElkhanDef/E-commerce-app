@@ -9,11 +9,12 @@ public class UserResponseDto {
     private String phoneNumber;
     private boolean isActive;
     private boolean isVerified;
+    private String role;
 
     public UserResponseDto(Long id, String name,
                            String lastName, String email,
                            String phoneNumber, boolean isActive,
-                           boolean isVerified) {
+                           boolean isVerified, String role) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
@@ -21,6 +22,7 @@ public class UserResponseDto {
         this.phoneNumber = phoneNumber;
         this.isActive = isActive;
         this.isVerified = isVerified;
+        this.role = role;
     }
 
     public UserResponseDto() {}
@@ -82,6 +84,12 @@ public class UserResponseDto {
     public void setVerified(boolean verified) {
         isVerified = verified;
     }
+    public String getRole() {
+        return role;
+    }
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     @SuppressWarnings("checkstyle:HiddenField")
     public static class Builder {
@@ -92,6 +100,7 @@ public class UserResponseDto {
         private String phoneNumber;
         private boolean isActive;
         private boolean isVerified;
+        private String role;
 
         public Builder id(Long id) {
             this.id = id;
@@ -121,8 +130,12 @@ public class UserResponseDto {
             this.isVerified = isVerified;
             return this;
         }
+        public Builder role(String role) {
+            this.role = role;
+            return this;
+        }
         public UserResponseDto build() {
-            return new UserResponseDto(id, name, lastName, email, phoneNumber, isActive, isVerified);
+            return new UserResponseDto(id, name, lastName, email, phoneNumber, isActive, isVerified, role);
         }
     }
 }
